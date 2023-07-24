@@ -2,17 +2,20 @@ sudo apt update
 
 sudo apt install python3-pip python3-dev build-essential libssl-dev libffi-dev python3-setuptools python3-venv
 
-git clone  
+git clone https://github.com/maks232930/RestaurantMenuAPI.git  
 
-cd project<br>
+cd RestaurantMenuAPI/<br>
 
 python3 -m venv venv<br>
 source venv/bin/activate<br>
-pip install -r requirements.txt1<br>
+pip install -r requirements.txt<br>
 
 Запускаем postgres: sudo docker-compose up --build -d<br>
 
-uvicorn src.main:app --reload
+запустили: uvicorn src.main:app --reload<br>
 
-В новой консоли: 
-alembic upgrade head
+Потом закрыли и: alembic upgrade head
+
+запустили: uvicorn src.main:app --reload<br>
+
+Можно тестировать
