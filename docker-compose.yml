@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:13.0-alpine
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    environment:
+      - POSTGRES_USER=menu_user
+      - POSTGRES_PASSWORD=menu_user
+      - POSTGRES_DB=menu
+    ports:
+      - "5555:5432"
+
+volumes:
+  postgres_data:
