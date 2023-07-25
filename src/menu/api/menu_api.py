@@ -28,20 +28,18 @@ async def get_menus(session: AsyncSession = Depends(get_async_session)):
 @router.get("/menus/{menu_id}", response_model=MenuDetailModel)
 async def get_menu(menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)):
     menu_query = select(Menu).where(Menu.id == menu_id)
-    submenu_query = select(Submenu.id).where(Submenu.menu_id == menu_id)
-
     result_menu = await session.execute(menu_query)
+    menu = result_menu.scalar()
 
+    if not menu:
+        raise HTTPException(status_code=404, detail="menu not found")
+
+    submenu_query = select(Submenu.id).where(Submenu.menu_id == menu_id)
     result_submenu = await session.execute(submenu_query)
     result_submenu_all = [i.id for i in result_submenu.all()]
 
     dish_query = select(Dish.id).where(Dish.submenu_id.in_(result_submenu_all))
     result_dish = await session.execute(dish_query)
-
-    menu = result_menu.scalar()
-
-    if not menu:
-        raise HTTPException(status_code=404, detail="menu not found")
 
     menu_detail = MenuDetailModel(
         id=menu.id,

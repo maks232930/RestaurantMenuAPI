@@ -27,17 +27,16 @@ async def get_submenus(menu_id: uuid.UUID, session: AsyncSession = Depends(get_a
 @router.get("/menus/{menu_id}/submenus/{submenu_id}", response_model=SubmenuDetailModel)
 async def get_submenu(menu_id: uuid.UUID, submenu_id: uuid.UUID,
                       session: AsyncSession = Depends(get_async_session)):
-    submenu_query = select(Submenu).where(Submenu.id == submenu_id)
-    dish_query = select(Dish.id).where(Dish.submenu_id == submenu_id)
-
+    submenu_query = select(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)
     result_submenu = await session.execute(submenu_query)
-    result_dish = await session.execute(dish_query)
-
     submenu = result_submenu.scalar()
-    dish = [i.id for i in result_dish.all()]
 
     if not submenu:
         raise HTTPException(status_code=404, detail="submenu not found")
+
+    dish_query = select(Dish.id).where(Dish.submenu_id == submenu_id)
+    result_dish = await session.execute(dish_query)
+    dish = [i.id for i in result_dish.all()]
 
     submenu_detail = SubmenuDetailModel(
         id=submenu.id,
@@ -63,7 +62,7 @@ async def create_submenu(menu_id: uuid.UUID, submenu: SubmenuCreate,
 @router.patch("/menus/{menu_id}/submenus/{submenu_id}", response_model=SubmenuModel)
 async def update_submenu(menu_id: uuid.UUID, submenu_id: uuid.UUID, submenu: SubmenuUpdate,
                          session: AsyncSession = Depends(get_async_session)):
-    query = update(Submenu).where(Submenu.id == submenu_id).values(**submenu.dict())
+    query = update(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id).values(**submenu.dict())
     await session.execute(query)
     await session.commit()
     db_submenu = await get_submenu_by_id(submenu_id, session=session)
