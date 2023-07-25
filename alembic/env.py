@@ -9,7 +9,9 @@ from sqlalchemy import pool
 from alembic import context
 
 from src.config import DB_HOST, DB_PORT, DB_USER, DB_NAME, DB_PASS
-from src.menu.models import *
+from src.menu.models.submenu import Submenu
+from src.menu.models.menu import Menu
+from src.menu.models.dish import Dish
 
 from src.database import Base
 

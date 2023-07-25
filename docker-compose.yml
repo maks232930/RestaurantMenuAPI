@@ -17,6 +17,5 @@ services:
     env_file:
       - ./.env_db
 
-
 volumes:
   postgres_data:
