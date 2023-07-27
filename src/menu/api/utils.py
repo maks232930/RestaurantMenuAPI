@@ -3,9 +3,9 @@ import uuid
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.menu.models.dish import Dish
-from src.menu.models.menu import Menu
-from src.menu.models.submenu import Submenu
+from src.menu.models.dish_model import Dish
+from src.menu.models.menu_model import Menu
+from src.menu.models.submenu_model import Submenu
 
 
 async def get_menu_by_id(menu_id: uuid.UUID, session: AsyncSession):

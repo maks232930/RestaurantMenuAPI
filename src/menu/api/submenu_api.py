@@ -7,9 +7,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.menu.api.utils import get_submenu_by_id
-from src.menu.models.dish import Dish
-from src.menu.models.submenu import Submenu, SubmenuModel, SubmenuDetailModel
-from src.menu.schemas import SubmenuCreate, SubmenuUpdate
+from src.menu.models.dish_model import Dish
+from src.menu.models.submenu_model import Submenu, SubmenuModel, SubmenuDetailModel
+from src.menu.schemas.submenu_schema import SubmenuCreate, SubmenuUpdate
 
 router = APIRouter(
     prefix="/api/v1",

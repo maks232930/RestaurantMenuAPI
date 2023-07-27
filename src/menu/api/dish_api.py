@@ -7,8 +7,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.menu.api.utils import get_dish_by_id
 from src.database import get_async_session
-from src.menu.models.dish import DishModel, Dish
-from src.menu.schemas import DishCreate, DishUpdate
+from src.menu.models.dish_model import DishModel, Dish
+from src.menu.schemas.dish_schema import DishCreate, DishUpdate
 
 router = APIRouter(
     prefix="/api/v1",

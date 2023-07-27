@@ -7,10 +7,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
 from src.menu.api.utils import get_menu_by_id
-from src.menu.models.dish import Dish
-from src.menu.models.menu import Menu, MenuModel, MenuDetailModel
-from src.menu.models.submenu import Submenu
-from src.menu.schemas import MenuCreate, MenuUpdate
+from src.menu.models.dish_model import Dish
+from src.menu.models.menu_model import Menu, MenuModel, MenuDetailModel
+from src.menu.models.submenu_model import Submenu
+from src.menu.schemas.menu_schema import MenuCreate, MenuUpdate
 
 router = APIRouter(
     prefix="/api/v1",
