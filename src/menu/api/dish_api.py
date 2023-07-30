@@ -35,7 +35,7 @@ async def get_dish(dish_id: uuid.UUID, session: AsyncSession = Depends(get_async
 
 @router.post("/menus/{menu_id}/submenus/{submenu_id}/dishes", response_model=DishModel, status_code=201)
 async def create_dish(submenu_id: uuid.UUID, dish: DishCreate, session: AsyncSession = Depends(get_async_session)):
-    db_dish = Dish(**dish.dict(), submenu_id=submenu_id)
+    db_dish = Dish(**dish.model_dump(), submenu_id=submenu_id)
     session.add(db_dish)
     await session.commit()
     await session.refresh(db_dish)
@@ -44,7 +44,7 @@ async def create_dish(submenu_id: uuid.UUID, dish: DishCreate, session: AsyncSes
 
 @router.patch("/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}", response_model=DishModel)
 async def update_dish(dish_id: uuid.UUID, dish: DishUpdate, session: AsyncSession = Depends(get_async_session)):
-    query = update(Dish).where(Dish.id == dish_id).values(**dish.dict())
+    query = update(Dish).where(Dish.id == dish_id).values(**dish.model_dump())
     await session.execute(query)
     await session.commit()
     db_dish = await get_dish_by_id(dish_id, session=session)

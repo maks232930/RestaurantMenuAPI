@@ -1,6 +1,6 @@
 #!/bin/sh
 
-sleep 7
+./wait-for-it.sh db:5432 --timeout=60
 
 alembic upgrade head
 

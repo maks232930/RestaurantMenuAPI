@@ -11,6 +11,7 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-RUN chmod +x entrypoint.sh
+RUN chmod +x wait-for-it.sh
+RUN chmod +x entrypoint.tests.sh
 
-CMD ["sh", "entrypoint.sh"]
+CMD ["sh", "entrypoint.tests.sh"]

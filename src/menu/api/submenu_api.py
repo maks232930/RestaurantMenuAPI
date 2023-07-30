@@ -52,7 +52,7 @@ async def get_submenu(menu_id: uuid.UUID, submenu_id: uuid.UUID,
 @router.post("/menus/{menu_id}/submenus", response_model=SubmenuModel, status_code=201)
 async def create_submenu(menu_id: uuid.UUID, submenu: SubmenuCreate,
                          session: AsyncSession = Depends(get_async_session)):
-    db_submenu = Submenu(**submenu.dict(), menu_id=menu_id)
+    db_submenu = Submenu(**submenu.model_dump(), menu_id=menu_id)
     session.add(db_submenu)
     await session.commit()
     await session.refresh(db_submenu)
@@ -62,7 +62,7 @@ async def create_submenu(menu_id: uuid.UUID, submenu: SubmenuCreate,
 @router.patch("/menus/{menu_id}/submenus/{submenu_id}", response_model=SubmenuModel)
 async def update_submenu(menu_id: uuid.UUID, submenu_id: uuid.UUID, submenu: SubmenuUpdate,
                          session: AsyncSession = Depends(get_async_session)):
-    query = update(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id).values(**submenu.dict())
+    query = update(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id).values(**submenu.model_dump())
     await session.execute(query)
     await session.commit()
     db_submenu = await get_submenu_by_id(submenu_id, session=session)

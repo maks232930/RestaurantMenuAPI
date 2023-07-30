@@ -54,7 +54,7 @@ async def get_menu(menu_id: uuid.UUID, session: AsyncSession = Depends(get_async
 
 @router.post("/menus", response_model=MenuModel, status_code=201)
 async def create_menu(menu: MenuCreate, session: AsyncSession = Depends(get_async_session)):
-    db_menu = Menu(**menu.dict())
+    db_menu = Menu(**menu.model_dump())
     session.add(db_menu)
     await session.commit()
     await session.refresh(db_menu)
@@ -63,7 +63,7 @@ async def create_menu(menu: MenuCreate, session: AsyncSession = Depends(get_asyn
 
 @router.patch("/menus/{menu_id}", response_model=MenuModel)
 async def update_menu(menu_id: uuid.UUID, menu: MenuUpdate, session: AsyncSession = Depends(get_async_session)):
-    query = update(Menu).where(Menu.id == menu_id).values(**menu.dict())
+    query = update(Menu).where(Menu.id == menu_id).values(**menu.model_dump())
     await session.execute(query)
     await session.commit()
     db_menu = await get_menu_by_id(menu_id, session=session)

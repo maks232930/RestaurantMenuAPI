@@ -1,3 +1,6 @@
+import uuid
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -7,7 +10,7 @@ class SubmenuBase(BaseModel):
 
 
 class SubmenuCreate(SubmenuBase):
-    pass
+    id: Optional[uuid.UUID] = None
 
 
 class SubmenuUpdate(SubmenuBase):

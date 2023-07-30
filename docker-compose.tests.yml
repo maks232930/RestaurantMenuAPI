@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  web_test:
+    build:
+      context: .
+      dockerfile: Dockerfile.tests
+    environment:
+      - DB_HOST=db_test
+      - DB_PORT=5432
+      - DB_NAME=menu_test
+      - DB_USER=menu_user_test
+      - DB_PASS=menu_user_test
+    depends_on:
+      - db_test
+
+  db_test:
+    image: postgres:15.1-alpine
+    environment:
+      - POSTGRES_USER=menu_user_test
+      - POSTGRES_PASSWORD=menu_user_test
+      - POSTGRES_DB=menu_test
