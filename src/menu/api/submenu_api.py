@@ -2,7 +2,7 @@ import uuid
 from typing import List
 
 from fastapi import Depends, HTTPException, APIRouter
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -27,23 +27,28 @@ async def get_submenus(menu_id: uuid.UUID, session: AsyncSession = Depends(get_a
 @router.get("/menus/{menu_id}/submenus/{submenu_id}", response_model=SubmenuDetailModel)
 async def get_submenu(menu_id: uuid.UUID, submenu_id: uuid.UUID,
                       session: AsyncSession = Depends(get_async_session)):
-    submenu_query = select(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id)
+    submenu_query = select(
+        Submenu.id,
+        Submenu.title,
+        Submenu.description,
+        func.count(Dish.id).label("dish_count")
+    ).select_from(Submenu). \
+        outerjoin(Dish, Submenu.id == Dish.submenu_id). \
+        where(Submenu.menu_id == menu_id, Submenu.id == submenu_id). \
+        group_by(Submenu.id)
+
     result_submenu = await session.execute(submenu_query)
-    submenu = result_submenu.scalar()
+    submenu = result_submenu.first()
 
     if not submenu:
         raise HTTPException(status_code=404, detail="submenu not found")
 
-    dish_query = select(Dish.id).where(Dish.submenu_id == submenu_id)
-    result_dish = await session.execute(dish_query)
-    dish = [i.id for i in result_dish.all()]
-
     submenu_detail = SubmenuDetailModel(
         id=submenu.id,
         title=submenu.title,
-        menu_id=submenu.menu_id,
+        menu_id=menu_id,
         description=submenu.description,
-        dishes_count=len(dish)
+        dishes_count=int(submenu.dish_count) if submenu.dish_count is not None else 0
     )
 
     return submenu_detail

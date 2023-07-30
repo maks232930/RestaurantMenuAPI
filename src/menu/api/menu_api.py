@@ -2,7 +2,7 @@ import uuid
 from typing import List
 
 from fastapi import Depends, HTTPException, APIRouter
-from sqlalchemy import select, update, delete
+from sqlalchemy import select, update, delete, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -27,26 +27,32 @@ async def get_menus(session: AsyncSession = Depends(get_async_session)):
 
 @router.get("/menus/{menu_id}", response_model=MenuDetailModel)
 async def get_menu(menu_id: uuid.UUID, session: AsyncSession = Depends(get_async_session)):
-    menu_query = select(Menu).where(Menu.id == menu_id)
+    subquery = select(
+        Dish.submenu_id,
+        func.count(Dish.id).label("submenu_dish_count")
+    ).group_by(Dish.submenu_id).subquery()
+
+    menu_query = select(
+        Menu.id,
+        Menu.title,
+        Menu.description,
+        func.count(Submenu.id).label("submenu_count"),
+        func.sum(subquery.c.submenu_dish_count).label("total_dish_count")
+    ).select_from(Menu).outerjoin(Submenu).outerjoin(subquery, Submenu.id == subquery.c.submenu_id).where(
+        Menu.id == menu_id).group_by(Menu.id)
+
     result_menu = await session.execute(menu_query)
-    menu = result_menu.scalar()
+    menu = result_menu.first()
 
     if not menu:
         raise HTTPException(status_code=404, detail="menu not found")
-
-    submenu_query = select(Submenu.id).where(Submenu.menu_id == menu_id)
-    result_submenu = await session.execute(submenu_query)
-    result_submenu_all = [i.id for i in result_submenu.all()]
-
-    dish_query = select(Dish.id).where(Dish.submenu_id.in_(result_submenu_all))
-    result_dish = await session.execute(dish_query)
 
     menu_detail = MenuDetailModel(
         id=menu.id,
         title=menu.title,
         description=menu.description,
-        submenus_count=len(result_submenu_all),
-        dishes_count=len(result_dish.all())
+        submenus_count=int(menu.submenu_count) if menu.submenu_count is not None else 0,
+        dishes_count=int(menu.total_dish_count) if menu.total_dish_count is not None else 0
     )
 
     return menu_detail
