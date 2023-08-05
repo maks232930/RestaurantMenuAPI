@@ -1,4 +1,4 @@
-import decimal
+from decimal import Decimal
 import uuid
 
 from pydantic import BaseModel, UUID4
@@ -21,5 +21,5 @@ class DishModel(BaseModel):
     id: UUID4
     title: str
     description: str
-    price: decimal.Decimal
+    price: Decimal
     submenu_id: UUID4

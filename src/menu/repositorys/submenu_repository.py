@@ -13,7 +13,7 @@ class SubmenuRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_submenu_by_id(self, submenu_id: UUID):
+    async def get_submenu_by_id(self, submenu_id: UUID) -> SubmenuModel:
         query = select(Submenu).where(Submenu.id == submenu_id)
         result = await self.session.execute(query)
         return result.scalar()
@@ -48,14 +48,15 @@ class SubmenuRepository:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def create_submenu(self, menu_id: UUID, submenu_create: SubmenuCreate) -> Submenu:
+    async def create_submenu(self, menu_id: UUID, submenu_create: SubmenuCreate) -> SubmenuModel:
         db_submenu = Submenu(**submenu_create.model_dump(), menu_id=menu_id)
         self.session.add(db_submenu)
         await self.session.commit()
         await self.session.refresh(db_submenu)
         return db_submenu
 
-    async def update_submenu(self, menu_id: UUID, submenu_id: UUID, submenu_update: SubmenuUpdate) -> Submenu:
+    async def update_submenu(self, menu_id: UUID, submenu_id: UUID,
+                             submenu_update: SubmenuUpdate) -> Optional[SubmenuModel]:
         query = update(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id).values(
             **submenu_update.model_dump())
         await self.session.execute(query)

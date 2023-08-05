@@ -14,7 +14,7 @@ class MenuRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_menu_by_id(self, menu_id: UUID) -> Menu:
+    async def get_menu_by_id(self, menu_id: UUID) -> MenuModel:
         query = select(Menu).where(Menu.id == menu_id)
         result = await self.session.execute(query)
         return result.scalars().first()
@@ -53,22 +53,22 @@ class MenuRepository:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def create_menu(self, menu_create: MenuCreate) -> Menu:
+    async def create_menu(self, menu_create: MenuCreate) -> MenuModel:
         db_menu = Menu(**menu_create.model_dump())
         self.session.add(db_menu)
         await self.session.commit()
         await self.session.refresh(db_menu)
         return db_menu
 
-    async def update_menu(self, menu_id: UUID, menu_update: MenuUpdate) -> Menu:
+    async def update_menu(self, menu_id: UUID, menu_update: MenuUpdate) -> Optional[MenuModel]:
         query = update(Menu).where(Menu.id == menu_id).values(**menu_update.model_dump())
         await self.session.execute(query)
         await self.session.commit()
         return await self.get_menu_by_id(menu_id)
 
-    async def delete_menu(self, menu_id: UUID) -> Optional[Menu]:
+    async def delete_menu(self, menu_id: UUID) -> Optional[MenuModel]:
         db_menu = await self.get_menu_by_id(menu_id)
-        
+
         if not db_menu:
             return None
 

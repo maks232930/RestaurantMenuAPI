@@ -5,7 +5,6 @@ from sqlalchemy import select, update, delete
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.menu.models.dish_model import Dish, DishModel
-from src.menu.models.submenu_model import Submenu
 from src.menu.schemas.dish_schema import DishCreate, DishUpdate
 
 
@@ -13,7 +12,7 @@ class DishRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_dish_by_id(self, dish_id: UUID):
+    async def get_dish_by_id(self, dish_id: UUID) -> DishModel:
         query = select(Dish).where(Dish.id == dish_id)
         result = await self.session.execute(query)
         return result.scalar()
@@ -32,14 +31,14 @@ class DishRepository:
         result = await self.session.execute(query)
         return result.scalars().all()
 
-    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate) -> Dish:
+    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate) -> DishModel:
         db_dish = Dish(**dish_create.model_dump(), submenu_id=submenu_id)
         self.session.add(db_dish)
         await self.session.commit()
         await self.session.refresh(db_dish)
         return db_dish
 
-    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate) -> Dish:
+    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate) -> DishModel:
         query = update(Dish).where(Dish.id == dish_id).values(**dish_update.model_dump())
         await self.session.execute(query)
         await self.session.commit()
