@@ -1,14 +1,14 @@
 import pytest
 
-from conftest import DATA_MENU, DATA_SUBMENU, DATA_DISH, DATA_DISH_UPDATE
+from src.menu.tests.conftest import DATA_DISH, DATA_DISH_UPDATE, DATA_MENU, DATA_SUBMENU
 
 
 @pytest.mark.asyncio
-async def test_create_dish(client):
-    await client.post("/menus", json=DATA_MENU)
-    await client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
-    response = await client.post(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes',
-                                 json=DATA_DISH)
+async def test_create_dish(test_client):
+    await test_client.post('/menus', json=DATA_MENU)
+    await test_client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
+    response = await test_client.post(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes',
+                                      json=DATA_DISH)
 
     response_json = response.json()
 
@@ -20,8 +20,8 @@ async def test_create_dish(client):
 
 
 @pytest.mark.asyncio
-async def test_get_dishes(client):
-    response = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes')
+async def test_get_dishes(test_client):
+    response = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes')
     response_json = response.json()
 
     assert response.status_code == 200
@@ -32,8 +32,8 @@ async def test_get_dishes(client):
 
 
 @pytest.mark.asyncio
-async def test_get_dish(client):
-    response = await client.get(
+async def test_get_dish(test_client):
+    response = await test_client.get(
         f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}')
     response_json = response.json()
 
@@ -45,8 +45,8 @@ async def test_get_dish(client):
 
 
 @pytest.mark.asyncio
-async def test_patch_dish(client):
-    response = await client.patch(
+async def test_patch_dish(test_client):
+    response = await test_client.patch(
         f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}',
         json=DATA_DISH_UPDATE)
     response_json = response.json()
@@ -58,15 +58,15 @@ async def test_patch_dish(client):
 
 
 @pytest.mark.asyncio
-async def test_delete_dish(client):
-    await client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}')
-    await client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
-    await client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}')
+async def test_delete_dish(test_client):
+    await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}')
+    await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
+    await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}')
 
-    response_dish = await client.get(
+    response_dish = await test_client.get(
         f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}')
-    response_menu = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}')
-    response_submenu = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
+    response_menu = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}')
+    response_submenu = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
 
     assert response_dish.status_code == 404
     assert response_menu.status_code == 404

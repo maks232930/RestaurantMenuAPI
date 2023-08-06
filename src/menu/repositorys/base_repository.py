@@ -1,5 +1,5 @@
 import pickle
-from typing import Optional, Any, List
+from typing import Any
 
 from aioredis import from_url
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -20,7 +20,7 @@ class BaseRepository:
         redis = await from_url(self.REDIS_URL)
         return redis
 
-    async def get_cache(self, cache_key: Optional[str] = None) -> Any:
+    async def get_cache(self, cache_key: str | None = None) -> Any:
         async with await self.get_redis() as redis:
             cached_result = await redis.get(cache_key)
 
@@ -31,12 +31,12 @@ class BaseRepository:
 
             return result_data
 
-    async def set_cache(self, expiration: int = 600, cache_key: Optional[str] = None, result: Any = None) -> None:
+    async def set_cache(self, expiration: int = 600, cache_key: str | None = None, result: Any = None) -> None:
         async with await self.get_redis() as redis:
             serialized_result = self.model_encoder(result)
             await redis.setex(cache_key, expiration, serialized_result)
 
-    async def delete_cache(self, cache_keys: List[str]) -> None:
+    async def delete_cache(self, cache_keys: list[str]) -> None:
         async with await self.get_redis() as redis:
             for key in cache_keys:
                 redis.delete(key)

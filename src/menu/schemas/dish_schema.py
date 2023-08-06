@@ -1,5 +1,4 @@
 import uuid
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,7 +10,7 @@ class DishBase(BaseModel):
 
 
 class DishCreate(DishBase):
-    id: Optional[uuid.UUID] = None
+    id: uuid.UUID | None = None
 
 
 class DishUpdate(DishBase):

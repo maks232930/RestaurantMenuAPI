@@ -1,5 +1,4 @@
 import uuid
-from typing import Optional
 
 from pydantic import BaseModel
 
@@ -10,7 +9,7 @@ class MenuBase(BaseModel):
 
 
 class MenuCreate(MenuBase):
-    id: Optional[uuid.UUID] = None
+    id: uuid.UUID | None = None
 
 
 class MenuUpdate(MenuBase):

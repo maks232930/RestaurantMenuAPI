@@ -1,4 +1,3 @@
-from typing import Optional, List
 from uuid import UUID
 
 from src.menu.models.dish_model import DishModel
@@ -10,17 +9,17 @@ class DishService:
     def __init__(self, dish_repository: DishRepository):
         self.dish_repository = dish_repository
 
-    async def get_dish(self, dish_id: UUID) -> Optional[DishModel]:
+    async def get_dish(self, dish_id: UUID) -> DishModel | None:
         return await self.dish_repository.get_dish(dish_id)
 
-    async def get_dishes(self, submenu_id: UUID) -> List[DishModel]:
+    async def get_dishes(self, submenu_id: UUID) -> list[DishModel]:
         return await self.dish_repository.get_dishes(submenu_id)
 
-    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate) -> DishModel:
+    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate) -> DishModel | None:
         return await self.dish_repository.create_dish(submenu_id, dish_create)
 
-    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate) -> DishModel:
+    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate) -> DishModel | None:
         return await self.dish_repository.update_dish(dish_id, dish_update)
 
-    async def delete_menu(self, dish_id: UUID) -> DishModel:
+    async def delete_menu(self, dish_id: UUID) -> DishModel | None:
         return await self.dish_repository.delete_dish(dish_id)

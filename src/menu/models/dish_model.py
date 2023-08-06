@@ -1,8 +1,8 @@
-from decimal import Decimal
 import uuid
+from decimal import Decimal
 
-from pydantic import BaseModel, UUID4
-from sqlalchemy import Column, String, ForeignKey, UUID, Numeric
+from pydantic import UUID4, BaseModel
+from sqlalchemy import UUID, Column, ForeignKey, Numeric, String
 
 from src.database import Base
 

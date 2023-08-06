@@ -1,13 +1,12 @@
-from typing import Optional, List
 from uuid import UUID
 
-from sqlalchemy import select, func, update, delete
+from sqlalchemy import delete, func, select, update
 
 from src.menu.models.dish_model import Dish
-from src.menu.models.menu_model import MenuDetailModel, Menu, MenuModel
+from src.menu.models.menu_model import Menu, MenuDetailModel, MenuModel
 from src.menu.models.submenu_model import Submenu
 from src.menu.repositorys.base_repository import BaseRepository
-from src.menu.schemas.menu_schema import MenuUpdate, MenuCreate
+from src.menu.schemas.menu_schema import MenuCreate, MenuUpdate
 
 
 class MenuRepository(BaseRepository):
@@ -16,7 +15,7 @@ class MenuRepository(BaseRepository):
         result = await self.session.execute(query)
         return result.scalars().first()
 
-    async def get_menu_detail(self, menu_id: UUID) -> Optional[MenuDetailModel]:
+    async def get_menu_detail(self, menu_id: UUID) -> MenuDetailModel | None:
         cache_key = f'menu:{menu_id}'
         result: MenuDetailModel = await self.get_cache(cache_key)
         if result:
@@ -24,15 +23,15 @@ class MenuRepository(BaseRepository):
 
         subquery = select(
             Dish.submenu_id,
-            func.count(Dish.id).label("submenu_dish_count")
+            func.count(Dish.id).label('submenu_dish_count')
         ).group_by(Dish.submenu_id).subquery()
 
         menu_query = select(
             Menu.id,
             Menu.title,
             Menu.description,
-            func.count(Submenu.id).label("submenu_count"),
-            func.sum(subquery.c.submenu_dish_count).label("total_dish_count")
+            func.count(Submenu.id).label('submenu_count'),
+            func.sum(subquery.c.submenu_dish_count).label('total_dish_count')
         ).select_from(Menu).outerjoin(Submenu).outerjoin(subquery, Submenu.id == subquery.c.submenu_id).where(
             Menu.id == menu_id).group_by(Menu.id)
 
@@ -53,7 +52,7 @@ class MenuRepository(BaseRepository):
         await self.set_cache(cache_key=cache_key, result=menu_detail)
         return menu_detail
 
-    async def get_menus(self) -> List[MenuModel]:
+    async def get_menus(self) -> list[MenuModel]:
         result = await self.get_cache('get_menus')
         if result:
             return result
@@ -74,7 +73,7 @@ class MenuRepository(BaseRepository):
 
         return db_menu
 
-    async def update_menu(self, menu_id: UUID, menu_update: MenuUpdate) -> Optional[MenuModel]:
+    async def update_menu(self, menu_id: UUID, menu_update: MenuUpdate) -> MenuModel | None:
         query = update(Menu).where(Menu.id == menu_id).values(**menu_update.model_dump())
         await self.session.execute(query)
         await self.session.commit()
@@ -83,7 +82,7 @@ class MenuRepository(BaseRepository):
 
         return await self.get_menu_by_id(menu_id)
 
-    async def delete_menu(self, menu_id: UUID) -> Optional[MenuModel]:
+    async def delete_menu(self, menu_id: UUID) -> MenuModel | None:
         db_menu = await self.get_menu_by_id(menu_id)
 
         if not db_menu:

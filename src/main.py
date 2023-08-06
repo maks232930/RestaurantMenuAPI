@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
+from src.menu.api.dish_api import router as router_dish
 from src.menu.api.menu_api import router as router_menu
 from src.menu.api.submenu_api import router as router_submenu
-from src.menu.api.dish_api import router as router_dish
 
 app = FastAPI()
 

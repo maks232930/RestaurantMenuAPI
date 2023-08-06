@@ -1,7 +1,7 @@
 import uuid
 
-from pydantic import BaseModel, UUID4
-from sqlalchemy import Column, String, ForeignKey, UUID
+from pydantic import UUID4, BaseModel
+from sqlalchemy import UUID, Column, ForeignKey, String
 
 from src.database import Base
 

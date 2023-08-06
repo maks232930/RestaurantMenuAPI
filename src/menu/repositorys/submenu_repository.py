@@ -1,11 +1,9 @@
-from typing import Optional, List
 from uuid import UUID
 
-from sqlalchemy import select, func, update, delete
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import delete, func, select, update
 
 from src.menu.models.dish_model import Dish
-from src.menu.models.submenu_model import SubmenuModel, SubmenuDetailModel, Submenu
+from src.menu.models.submenu_model import Submenu, SubmenuDetailModel, SubmenuModel
 from src.menu.repositorys.base_repository import BaseRepository
 from src.menu.schemas.submenu_schema import SubmenuCreate, SubmenuUpdate
 
@@ -16,7 +14,7 @@ class SubmenuRepository(BaseRepository):
         result = await self.session.execute(query)
         return result.scalar()
 
-    async def get_submenu_detail(self, menu_id: UUID, submenu_id: UUID) -> Optional[SubmenuDetailModel]:
+    async def get_submenu_detail(self, menu_id: UUID, submenu_id: UUID) -> SubmenuDetailModel | None:
         cache_key = f'submenu:{submenu_id}'
         result: SubmenuDetailModel = await self.get_cache(cache_key)
         if result:
@@ -26,7 +24,7 @@ class SubmenuRepository(BaseRepository):
             Submenu.id,
             Submenu.title,
             Submenu.description,
-            func.count(Dish.id).label("dish_count")
+            func.count(Dish.id).label('dish_count')
         ).select_from(Submenu). \
             outerjoin(Dish, Submenu.id == Dish.submenu_id). \
             where(Submenu.menu_id == menu_id, Submenu.id == submenu_id). \
@@ -50,7 +48,7 @@ class SubmenuRepository(BaseRepository):
 
         return submenu_detail
 
-    async def get_submenus(self, menu_id: UUID) -> List[SubmenuModel]:
+    async def get_submenus(self, menu_id: UUID) -> list[SubmenuModel]:
         result = await self.get_cache('get_submenus')
         if result:
             return result
@@ -72,7 +70,7 @@ class SubmenuRepository(BaseRepository):
         return db_submenu
 
     async def update_submenu(self, menu_id: UUID, submenu_id: UUID,
-                             submenu_update: SubmenuUpdate) -> Optional[SubmenuModel]:
+                             submenu_update: SubmenuUpdate) -> SubmenuModel | None:
         query = update(Submenu).where(Submenu.menu_id == menu_id, Submenu.id == submenu_id).values(
             **submenu_update.model_dump())
         await self.session.execute(query)
@@ -82,7 +80,7 @@ class SubmenuRepository(BaseRepository):
 
         return await self.get_submenu_by_id(submenu_id)
 
-    async def delete_submenu(self, submenu_id: UUID) -> Optional[SubmenuModel]:
+    async def delete_submenu(self, submenu_id: UUID) -> SubmenuModel | None:
         db_submenu = await self.get_submenu_by_id(submenu_id)
 
         if not db_submenu:

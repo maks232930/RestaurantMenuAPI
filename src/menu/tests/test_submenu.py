@@ -1,12 +1,12 @@
 import pytest
 
-from conftest import DATA_MENU, DATA_SUBMENU, DATA_SUBMENU_UPDATE
+from src.menu.tests.conftest import DATA_MENU, DATA_SUBMENU, DATA_SUBMENU_UPDATE
 
 
 @pytest.mark.asyncio
-async def test_create_submenu(client):
-    await client.post('/menus', json=DATA_MENU)
-    response = await client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
+async def test_create_submenu(test_client):
+    await test_client.post('/menus', json=DATA_MENU)
+    response = await test_client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
     response_json = response.json()
 
     assert response.status_code == 201
@@ -17,8 +17,8 @@ async def test_create_submenu(client):
 
 
 @pytest.mark.asyncio
-async def test_get_submenus(client):
-    response = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus')
+async def test_get_submenus(test_client):
+    response = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus')
     response_json = response.json()
 
     assert response.status_code == 200
@@ -30,8 +30,8 @@ async def test_get_submenus(client):
 
 
 @pytest.mark.asyncio
-async def test_get_submenu_detail(client):
-    response = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
+async def test_get_submenu_detail(test_client):
+    response = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
     response_json = response.json()
 
     assert response.status_code == 200
@@ -42,9 +42,9 @@ async def test_get_submenu_detail(client):
 
 
 @pytest.mark.asyncio
-async def test_patch_submenu(client):
-    response = await client.patch(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}',
-                                  json=DATA_SUBMENU_UPDATE)
+async def test_patch_submenu(test_client):
+    response = await test_client.patch(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}',
+                                       json=DATA_SUBMENU_UPDATE)
     response_json = response.json()
 
     assert response.status_code == 200
@@ -52,14 +52,13 @@ async def test_patch_submenu(client):
     assert response_json['description'] == DATA_SUBMENU_UPDATE['description']
 
 
-
 @pytest.mark.asyncio
-async def test_delete_submenu(client):
-    await client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
-    await client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}')
+async def test_delete_submenu(test_client):
+    await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
+    await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}')
 
-    response_menu = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}')
-    response_submenu = await client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
+    response_menu = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}')
+    response_submenu = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
 
     assert response_menu.status_code == 404
     assert response_submenu.status_code == 404

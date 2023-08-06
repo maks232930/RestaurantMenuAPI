@@ -1,7 +1,6 @@
-from typing import Optional, List
 from uuid import UUID
 
-from sqlalchemy import select, update, delete
+from sqlalchemy import delete, select, update
 
 from src.menu.models.dish_model import Dish, DishModel
 from src.menu.repositorys.base_repository import BaseRepository
@@ -14,7 +13,7 @@ class DishRepository(BaseRepository):
         result = await self.session.execute(query)
         return result.scalar()
 
-    async def get_dish(self, dish_id: UUID) -> Optional[DishModel]:
+    async def get_dish(self, dish_id: UUID) -> DishModel | None:
         cache_key = f'dish:{dish_id}'
         result: DishModel = await self.get_cache(cache_key)
         if result:
@@ -32,7 +31,7 @@ class DishRepository(BaseRepository):
 
         return result
 
-    async def get_dishes(self, submenu_id: UUID) -> List[DishModel]:
+    async def get_dishes(self, submenu_id: UUID) -> list[DishModel]:
         result = await self.get_cache('get_dishes')
         if result:
             return result
@@ -63,7 +62,7 @@ class DishRepository(BaseRepository):
 
         return await self.get_dish_by_id(dish_id)
 
-    async def delete_dish(self, dish_id: UUID) -> Optional[DishModel]:
+    async def delete_dish(self, dish_id: UUID) -> DishModel | None:
         db_dish = await self.get_dish_by_id(dish_id)
 
         if not db_dish:

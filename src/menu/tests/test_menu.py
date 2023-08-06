@@ -1,11 +1,11 @@
 import pytest
 
-from conftest import DATA_MENU, DATA_MENU_UPDATE
+from src.menu.tests.conftest import DATA_MENU, DATA_MENU_UPDATE
 
 
 @pytest.mark.asyncio
-async def test_create_menu(client):
-    response = await client.post("/menus", json=DATA_MENU)
+async def test_create_menu(test_client):
+    response = await test_client.post('/menus', json=DATA_MENU)
     response_json = response.json()
 
     assert response.status_code == 201
@@ -15,8 +15,8 @@ async def test_create_menu(client):
 
 
 @pytest.mark.asyncio
-async def test_get_menus(client):
-    response = await client.get("/menus")
+async def test_get_menus(test_client):
+    response = await test_client.get('/menus')
     response_json = response.json()
 
     assert len(response_json) == 1
@@ -26,8 +26,8 @@ async def test_get_menus(client):
 
 
 @pytest.mark.asyncio
-async def test_get_menu_detail(client):
-    response = await client.get(f'/menus/{DATA_MENU["id"]}')
+async def test_get_menu_detail(test_client):
+    response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
     response_json = response.json()
 
     assert response_json['id'] == DATA_MENU['id']
@@ -38,8 +38,8 @@ async def test_get_menu_detail(client):
 
 
 @pytest.mark.asyncio
-async def test_patch_menu(client):
-    response = await client.patch(f'/menus/{DATA_MENU["id"]}', json=DATA_MENU_UPDATE)
+async def test_patch_menu(test_client):
+    response = await test_client.patch(f'/menus/{DATA_MENU["id"]}', json=DATA_MENU_UPDATE)
     response_json = response.json()
 
     assert response_json['title'] == DATA_MENU_UPDATE['title']
@@ -47,8 +47,8 @@ async def test_patch_menu(client):
 
 
 @pytest.mark.asyncio
-async def test_delete_menu(client):
-    await client.delete(f'/menus/{DATA_MENU["id"]}')
-    response = await client.get(f'/menus/{DATA_MENU["id"]}')
+async def test_delete_menu(test_client):
+    await test_client.delete(f'/menus/{DATA_MENU["id"]}')
+    response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
 
     assert response.status_code == 404
