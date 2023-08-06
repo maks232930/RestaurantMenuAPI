@@ -3,6 +3,8 @@
 ./wait-for-it.sh db_test:5432 --timeout=60
 ./wait-for-it.sh redis_test:6379 --timeout=60
 
+sleep 5
+
 alembic upgrade head
 
 sleep 1
