@@ -1,7 +1,7 @@
 import pickle
 from typing import Any
 
-from aioredis import from_url
+from aioredis import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import REDIS_URL
@@ -10,13 +10,13 @@ from src.database import REDIS_URL
 class BaseRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
-        self.REDIS_URL = REDIS_URL
+        self.REDIS_URL: str = REDIS_URL
 
     @staticmethod
-    def model_encoder(obj):
+    def model_encoder(obj: Any) -> bytes:
         return pickle.dumps(obj)
 
-    async def get_redis(self):
+    async def get_redis(self) -> Redis:
         redis = await from_url(self.REDIS_URL)
         return redis
 

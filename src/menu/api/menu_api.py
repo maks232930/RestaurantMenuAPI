@@ -21,12 +21,12 @@ async def get_menu_service(session: AsyncSession = Depends(get_async_session)) -
 
 
 @router.get('/menus', response_model=list[MenuModel])
-async def get_menus(menu_service: MenuService = Depends(get_menu_service)):
+async def get_menus(menu_service: MenuService = Depends(get_menu_service)) -> list[MenuModel]:
     return await menu_service.get_menus()
 
 
 @router.get('/menus/{menu_id}', response_model=MenuDetailModel)
-async def get_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)):
+async def get_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)) -> MenuDetailModel:
     menu_detail = await menu_service.get_menu_detail(menu_id)
 
     if not menu_detail:
@@ -36,14 +36,15 @@ async def get_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_s
 
 
 @router.post('/menus', response_model=MenuModel, status_code=201)
-async def create_menu(menu_create: MenuCreate, menu_service: MenuService = Depends(get_menu_service)):
+async def create_menu(menu_create: MenuCreate,
+                      menu_service: MenuService = Depends(get_menu_service)) -> MenuModel | None:
     db_menu = await menu_service.create_menu(menu_create)
     return db_menu
 
 
 @router.patch('/menus/{menu_id}', response_model=MenuModel)
 async def update_menu(menu_id: UUID, menu_update: MenuUpdate,
-                      menu_service: MenuService = Depends(get_menu_service)):
+                      menu_service: MenuService = Depends(get_menu_service)) -> MenuModel | None:
     db_menu = await menu_service.update_menu(menu_id, menu_update)
 
     if not db_menu:
@@ -53,7 +54,7 @@ async def update_menu(menu_id: UUID, menu_update: MenuUpdate,
 
 
 @router.delete('/menus/{menu_id}', response_model=MenuModel)
-async def delete_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)):
+async def delete_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)) -> MenuModel | None:
     db_menu = await menu_service.delete_menu(menu_id)
 
     if not db_menu:

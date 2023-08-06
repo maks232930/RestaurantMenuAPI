@@ -8,7 +8,7 @@ from src.menu.schemas.dish_schema import DishCreate, DishUpdate
 
 
 class DishRepository(BaseRepository):
-    async def get_dish_by_id(self, dish_id: UUID) -> DishModel:
+    async def get_dish_by_id(self, dish_id: UUID) -> DishModel | None:
         query = select(Dish).where(Dish.id == dish_id)
         result = await self.session.execute(query)
         return result.scalar()
@@ -43,7 +43,7 @@ class DishRepository(BaseRepository):
         await self.set_cache(cache_key='get_dishes', result=result_all)
         return result_all
 
-    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate) -> DishModel:
+    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate) -> DishModel | None:
         db_dish = Dish(**dish_create.model_dump(), submenu_id=submenu_id)
         self.session.add(db_dish)
         await self.session.commit()
@@ -53,7 +53,7 @@ class DishRepository(BaseRepository):
 
         return db_dish
 
-    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate) -> DishModel:
+    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate) -> DishModel | None:
         query = update(Dish).where(Dish.id == dish_id).values(**dish_update.model_dump())
         await self.session.execute(query)
         await self.session.commit()
