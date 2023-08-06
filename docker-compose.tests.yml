@@ -11,8 +11,11 @@ services:
       - DB_NAME=menu_test
       - DB_USER=menu_user_test
       - DB_PASS=menu_user_test
+      - REDIS_PORT=6379
+      - REDIS_HOST=redis_test
     depends_on:
       - db_test
+      - redis_test
 
   db_test:
     image: postgres:15.1-alpine
@@ -20,3 +23,7 @@ services:
       - POSTGRES_USER=menu_user_test
       - POSTGRES_PASSWORD=menu_user_test
       - POSTGRES_DB=menu_test
+
+  redis_test:
+    image: redis:7-alpine
+

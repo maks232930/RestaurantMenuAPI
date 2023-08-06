@@ -8,6 +8,7 @@ services:
     ports:
       - "8000:8000"
     depends_on:
+      - redis
       - db
 
   db:
@@ -16,6 +17,11 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env_db
+
+  redis:
+    image: redis:7-alpine
+    env_file:
+      - ./.env_redis
 
 volumes:
   postgres_data:
