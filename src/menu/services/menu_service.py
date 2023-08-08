@@ -7,7 +7,7 @@ from src.menu.schemas.menu_schema import MenuCreate, MenuUpdate
 
 class MenuService:
     def __init__(self, menu_repository: MenuRepository):
-        self.menu_repository = menu_repository
+        self.menu_repository: MenuRepository = menu_repository
 
     async def get_menu_detail(self, menu_id: UUID) -> MenuDetailModel | None:
         return await self.menu_repository.get_menu_detail(menu_id)

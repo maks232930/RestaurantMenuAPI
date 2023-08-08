@@ -9,10 +9,10 @@ from src.database import Base
 class Submenu(Base):
     __tablename__ = 'submenu'
 
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    menu_id = Column(UUID, ForeignKey('menu.id', ondelete='CASCADE'), nullable=False, unique=True)
+    id: UUID4 = Column(UUID, primary_key=True, default=uuid.uuid4)
+    title: str = Column(String, nullable=False)
+    description: str = Column(String, nullable=False)
+    menu_id: UUID4 = Column(UUID, ForeignKey('menu.id', ondelete='CASCADE'), nullable=False, unique=True)
 
 
 class SubmenuModel(BaseModel):

@@ -16,7 +16,7 @@ router = APIRouter(
 
 
 async def get_menu_service(session: AsyncSession = Depends(get_async_session)) -> MenuService:
-    menu_repository = MenuRepository(session)
+    menu_repository: MenuRepository = MenuRepository(session)
     return MenuService(menu_repository)
 
 
@@ -27,7 +27,7 @@ async def get_menus(menu_service: MenuService = Depends(get_menu_service)) -> li
 
 @router.get('/menus/{menu_id}', response_model=MenuDetailModel)
 async def get_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)) -> MenuDetailModel:
-    menu_detail = await menu_service.get_menu_detail(menu_id)
+    menu_detail: MenuDetailModel | None = await menu_service.get_menu_detail(menu_id)
 
     if not menu_detail:
         raise HTTPException(status_code=404, detail='menu not found')
@@ -38,14 +38,14 @@ async def get_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_s
 @router.post('/menus', response_model=MenuModel, status_code=201)
 async def create_menu(menu_create: MenuCreate,
                       menu_service: MenuService = Depends(get_menu_service)) -> MenuModel | None:
-    db_menu = await menu_service.create_menu(menu_create)
+    db_menu: MenuModel | None = await menu_service.create_menu(menu_create)
     return db_menu
 
 
 @router.patch('/menus/{menu_id}', response_model=MenuModel)
 async def update_menu(menu_id: UUID, menu_update: MenuUpdate,
                       menu_service: MenuService = Depends(get_menu_service)) -> MenuModel | None:
-    db_menu = await menu_service.update_menu(menu_id, menu_update)
+    db_menu: MenuModel | None = await menu_service.update_menu(menu_id, menu_update)
 
     if not db_menu:
         raise HTTPException(status_code=404, detail='menu not found')
@@ -55,7 +55,7 @@ async def update_menu(menu_id: UUID, menu_update: MenuUpdate,
 
 @router.delete('/menus/{menu_id}', response_model=MenuModel)
 async def delete_menu(menu_id: UUID, menu_service: MenuService = Depends(get_menu_service)) -> MenuModel | None:
-    db_menu = await menu_service.delete_menu(menu_id)
+    db_menu: MenuModel | None = await menu_service.delete_menu(menu_id)
 
     if not db_menu:
         raise HTTPException(status_code=404, detail='menu not found')

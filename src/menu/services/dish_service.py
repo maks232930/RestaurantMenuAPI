@@ -7,7 +7,7 @@ from src.menu.schemas.dish_schema import DishCreate, DishUpdate
 
 class DishService:
     def __init__(self, dish_repository: DishRepository):
-        self.dish_repository = dish_repository
+        self.dish_repository: DishRepository = dish_repository
 
     async def get_dish(self, dish_id: UUID, submenu_id: UUID, menu_id: UUID) -> DishModel | None:
         return await self.dish_repository.get_dish(dish_id, submenu_id, menu_id)

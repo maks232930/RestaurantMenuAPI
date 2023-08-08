@@ -1,4 +1,4 @@
-import uuid
+from uuid import UUID
 
 from pydantic import BaseModel
 
@@ -10,7 +10,7 @@ class DishBase(BaseModel):
 
 
 class DishCreate(DishBase):
-    id: uuid.UUID | None = None
+    id: UUID | None = None
 
 
 class DishUpdate(DishBase):

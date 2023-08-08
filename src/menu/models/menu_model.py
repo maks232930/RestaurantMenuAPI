@@ -9,9 +9,9 @@ from src.database import Base
 class Menu(Base):
     __tablename__ = 'menu'
 
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
+    id: UUID4 = Column(UUID, primary_key=True, default=uuid.uuid4)
+    title: str = Column(String, nullable=False)
+    description: str = Column(String, nullable=False)
 
 
 class MenuModel(BaseModel):

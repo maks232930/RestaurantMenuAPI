@@ -10,11 +10,11 @@ from src.database import Base
 class Dish(Base):
     __tablename__ = 'dish'
 
-    id = Column(UUID, primary_key=True, default=uuid.uuid4)
-    title = Column(String, nullable=False, unique=True)
-    description = Column(String, nullable=False)
-    price = Column(Numeric(precision=10, scale=2), nullable=False)
-    submenu_id = Column(UUID, ForeignKey('submenu.id', ondelete='CASCADE'), nullable=False)
+    id: UUID4 = Column(UUID, primary_key=True, default=uuid.uuid4)
+    title: str = Column(String, nullable=False, unique=True)
+    description: str = Column(String, nullable=False)
+    price: float = Column(Numeric(precision=10, scale=2), nullable=False)
+    submenu_id: UUID4 = Column(UUID, ForeignKey('submenu.id', ondelete='CASCADE'), nullable=False)
 
 
 class DishModel(BaseModel):

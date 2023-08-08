@@ -9,7 +9,7 @@ from src.database import REDIS_URL
 
 class BaseRepository:
     def __init__(self, session: AsyncSession):
-        self.session = session
+        self.session: AsyncSession = session
         self.REDIS_URL: str = REDIS_URL
 
     @staticmethod
@@ -17,15 +17,15 @@ class BaseRepository:
         return pickle.dumps(obj)
 
     async def get_redis(self) -> Redis:
-        redis = await from_url(self.REDIS_URL)
+        redis: Redis = await from_url(self.REDIS_URL)
         return redis
 
     async def get_cache(self, cache_key: str | None = None) -> Any:
         async with await self.get_redis() as redis:
-            cached_result = await redis.get(cache_key)
+            cached_result: Any = await redis.get(cache_key)
 
             if cached_result:
-                result_data = pickle.loads(cached_result)
+                result_data: Any = pickle.loads(cached_result)
             else:
                 result_data = None
 
@@ -33,7 +33,7 @@ class BaseRepository:
 
     async def set_cache(self, expiration: int = 3600, cache_key: str | None = None, result: Any = None) -> None:
         async with await self.get_redis() as redis:
-            serialized_result = self.model_encoder(result)
+            serialized_result: bytes = self.model_encoder(result)
             await redis.setex(cache_key, expiration, serialized_result)
 
     async def delete_cache(self, cache_keys: list[str]) -> None:
@@ -89,7 +89,7 @@ class BaseRepository:
                 return await redis.unlink(*caches_to_delete)
 
             for pattern in patterns:
-                result = await redis.scan(match=pattern)
+                result: Any = await redis.scan(match=pattern)
                 for key in result[1]:
                     caches_to_delete.append(key.decode('utf-8'))
 

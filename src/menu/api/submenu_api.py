@@ -16,20 +16,20 @@ router = APIRouter(
 
 
 async def get_submenu_service(session: AsyncSession = Depends(get_async_session)) -> SubmenuService:
-    submenu_repository = SubmenuRepository(session)
+    submenu_repository: SubmenuRepository = SubmenuRepository(session)
     return SubmenuService(submenu_repository)
 
 
 @router.get('/menus/{menu_id}/submenus', response_model=list[SubmenuModel])
-async def get_submenus(menu_id: UUID, submenu_service: SubmenuService = Depends(get_submenu_service)) -> list[
-        SubmenuModel]:
+async def get_submenus(menu_id: UUID, submenu_service: SubmenuService = Depends(get_submenu_service)) \
+        -> list[SubmenuModel] | None:
     return await submenu_service.get_submenus(menu_id)
 
 
 @router.get('/menus/{menu_id}/submenus/{submenu_id}', response_model=SubmenuDetailModel)
 async def get_submenu(menu_id: UUID, submenu_id: UUID,
-                      submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuDetailModel:
-    submenu_detail = await submenu_service.get_submenu_detail(menu_id, submenu_id)
+                      submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuDetailModel | None:
+    submenu_detail: SubmenuDetailModel | None = await submenu_service.get_submenu_detail(menu_id, submenu_id)
 
     if not submenu_detail:
         raise HTTPException(status_code=404, detail='submenu not found')
@@ -40,14 +40,14 @@ async def get_submenu(menu_id: UUID, submenu_id: UUID,
 @router.post('/menus/{menu_id}/submenus', response_model=SubmenuModel, status_code=201)
 async def create_submenu(menu_id: UUID, submenu_create: SubmenuCreate,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu = await submenu_service.create_submenu(menu_id, submenu_create)
+    db_submenu: SubmenuModel | None = await submenu_service.create_submenu(menu_id, submenu_create)
     return db_submenu
 
 
 @router.patch('/menus/{menu_id}/submenus/{submenu_id}', response_model=SubmenuModel)
 async def update_submenu(menu_id: UUID, submenu_id: UUID, submenu_update: SubmenuUpdate,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu = await submenu_service.update_submenu(menu_id, submenu_id, submenu_update)
+    db_submenu: SubmenuModel | None = await submenu_service.update_submenu(menu_id, submenu_id, submenu_update)
 
     if not db_submenu:
         raise HTTPException(status_code=404, detail='submenu not found')
@@ -58,7 +58,7 @@ async def update_submenu(menu_id: UUID, submenu_id: UUID, submenu_update: Submen
 @router.delete('/menus/{menu_id}/submenus/{submenu_id}', response_model=SubmenuModel)
 async def delete_submenu(submenu_id: UUID, menu_id: UUID,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu = await submenu_service.delete_submenu(submenu_id, menu_id)
+    db_submenu: SubmenuModel | None = await submenu_service.delete_submenu(submenu_id, menu_id)
 
     if not db_submenu:
         raise HTTPException(status_code=404, detail='submenu not found')

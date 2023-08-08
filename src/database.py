@@ -1,6 +1,6 @@
-from typing import AsyncGenerator
+from typing import Any, AsyncGenerator
 
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
 from src.config import (
@@ -16,10 +16,10 @@ from src.config import (
 DATABASE_URL: str = f'postgresql+asyncpg://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 REDIS_URL: str = f'redis://{REDIS_HOST}:{REDIS_PORT}'
 
-Base = declarative_base()
+Base: Any = declarative_base()
 
-engine = create_async_engine(DATABASE_URL)
-async_session_maker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+engine: AsyncEngine = create_async_engine(DATABASE_URL)
+async_session_maker: sessionmaker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

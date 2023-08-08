@@ -7,12 +7,12 @@ from src.menu.schemas.submenu_schema import SubmenuCreate, SubmenuUpdate
 
 class SubmenuService:
     def __init__(self, submenu_repository: SubmenuRepository):
-        self.submenu_repository = submenu_repository
+        self.submenu_repository: SubmenuRepository = submenu_repository
 
     async def get_submenu_detail(self, menu_id: UUID, submenu_id: UUID) -> SubmenuDetailModel | None:
         return await self.submenu_repository.get_submenu_detail(menu_id, submenu_id)
 
-    async def get_submenus(self, menu_id: UUID) -> list[SubmenuModel]:
+    async def get_submenus(self, menu_id: UUID) -> list[SubmenuModel] | None:
         return await self.submenu_repository.get_submenus(menu_id)
 
     async def create_submenu(self, menu_id: UUID, submenu_create: SubmenuCreate) -> SubmenuModel | None:
