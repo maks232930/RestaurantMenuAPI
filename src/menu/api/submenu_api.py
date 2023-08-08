@@ -56,9 +56,9 @@ async def update_submenu(menu_id: UUID, submenu_id: UUID, submenu_update: Submen
 
 
 @router.delete('/menus/{menu_id}/submenus/{submenu_id}', response_model=SubmenuModel)
-async def delete_submenu(submenu_id: UUID,
+async def delete_submenu(submenu_id: UUID, menu_id: UUID,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu = await submenu_service.delete_submenu(submenu_id)
+    db_submenu = await submenu_service.delete_submenu(submenu_id, menu_id)
 
     if not db_submenu:
         raise HTTPException(status_code=404, detail='submenu not found')

@@ -69,7 +69,7 @@ class MenuRepository(BaseRepository):
         await self.session.commit()
         await self.session.refresh(db_menu)
 
-        await self.delete_all_cache()
+        await self.delete_cache(['get_menus'])
 
         return db_menu
 
@@ -78,7 +78,12 @@ class MenuRepository(BaseRepository):
         await self.session.execute(query)
         await self.session.commit()
 
-        await self.delete_all_cache()
+        await self.delete_cache(
+            [
+                'get_menus',
+                f'menu:{menu_id}'
+            ]
+        )
 
         return await self.get_menu_by_id(menu_id)
 
@@ -92,6 +97,6 @@ class MenuRepository(BaseRepository):
         await self.session.execute(query)
         await self.session.commit()
 
-        await self.delete_all_cache()
+        await self.delete_related_cache(repository='menu', menu_id=menu_id)
 
         return db_menu

@@ -21,13 +21,15 @@ async def get_dish_service(session: AsyncSession = Depends(get_async_session)) -
 
 
 @router.get('/menus/{menu_id}/submenus/{submenu_id}/dishes', response_model=list[DishModel])
-async def get_dishes(submenu_id: UUID, dish_service: DishService = Depends(get_dish_service)) -> list[DishModel]:
-    return await dish_service.get_dishes(submenu_id)
+async def get_dishes(submenu_id: UUID, menu_id: UUID, dish_service: DishService = Depends(get_dish_service)) \
+        -> list[DishModel]:
+    return await dish_service.get_dishes(submenu_id, menu_id)
 
 
 @router.get('/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=DishModel)
-async def get_dish(dish_id: UUID, dish_service: DishService = Depends(get_dish_service)) -> DishModel | None:
-    dish = await dish_service.get_dish(dish_id)
+async def get_dish(dish_id: UUID, submenu_id: UUID, menu_id: UUID,
+                   dish_service: DishService = Depends(get_dish_service)) -> DishModel | None:
+    dish = await dish_service.get_dish(dish_id, submenu_id, menu_id)
 
     if not dish:
         raise HTTPException(status_code=404, detail='dish not found')
@@ -36,16 +38,16 @@ async def get_dish(dish_id: UUID, dish_service: DishService = Depends(get_dish_s
 
 
 @router.post('/menus/{menu_id}/submenus/{submenu_id}/dishes', response_model=DishModel, status_code=201)
-async def create_dish(submenu_id: UUID, dish_create: DishCreate,
+async def create_dish(submenu_id: UUID, dish_create: DishCreate, menu_id: UUID,
                       dish_service: DishService = Depends(get_dish_service)) -> DishModel | None:
-    db_dish = await dish_service.create_dish(submenu_id, dish_create)
+    db_dish = await dish_service.create_dish(submenu_id, dish_create, menu_id)
     return db_dish
 
 
 @router.patch('/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=DishModel)
-async def update_dish(dish_id: UUID, dish_update: DishUpdate,
+async def update_dish(dish_id: UUID, dish_update: DishUpdate, menu_id: UUID, submenu_id: UUID,
                       dish_service: DishService = Depends(get_dish_service)) -> DishModel | None:
-    db_dish = await dish_service.update_dish(dish_id, dish_update)
+    db_dish = await dish_service.update_dish(dish_id, dish_update, menu_id, submenu_id)
 
     if not db_dish:
         raise HTTPException(status_code=404, detail='dish not found')
@@ -54,8 +56,9 @@ async def update_dish(dish_id: UUID, dish_update: DishUpdate,
 
 
 @router.delete('/menus/{menu_id}/submenus/{submenu_id}/dishes/{dish_id}', response_model=DishModel)
-async def delete_dish(dish_id: UUID, dish_service: DishService = Depends(get_dish_service)) -> DishModel | None:
-    db_dish = await dish_service.delete_menu(dish_id)
+async def delete_dish(dish_id: UUID, menu_id: UUID, submenu_id: UUID,
+                      dish_service: DishService = Depends(get_dish_service)) -> DishModel | None:
+    db_dish = await dish_service.delete_menu(menu_id, submenu_id, dish_id)
 
     if not db_dish:
         raise HTTPException(status_code=404, detail='dish not found')

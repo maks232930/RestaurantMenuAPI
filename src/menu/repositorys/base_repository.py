@@ -31,16 +31,66 @@ class BaseRepository:
 
             return result_data
 
-    async def set_cache(self, expiration: int = 600, cache_key: str | None = None, result: Any = None) -> None:
+    async def set_cache(self, expiration: int = 3600, cache_key: str | None = None, result: Any = None) -> None:
         async with await self.get_redis() as redis:
             serialized_result = self.model_encoder(result)
             await redis.setex(cache_key, expiration, serialized_result)
 
     async def delete_cache(self, cache_keys: list[str]) -> None:
         async with await self.get_redis() as redis:
-            for key in cache_keys:
-                redis.delete(key)
+            await redis.unlink(*cache_keys)
 
-    async def delete_all_cache(self) -> None:
+    async def delete_related_cache(self, repository: str, **kwargs) -> None:
+        caches_to_delete: list = []
+        patterns: list = []
+        cache_template: str = ''
+
+        if repository == 'menu':
+            cache_template = f'menu:{kwargs["menu_id"]}'
+            cache_template_get_dishes: str = f'get_dishes:{kwargs["menu_id"]}:*'
+
+            caches_to_delete.extend(
+                [
+                    'get_menus',
+                    f'get_submenus:{kwargs["menu_id"]}',
+                    cache_template
+                ]
+            )
+
+            patterns.extend([f'{cache_template}:*', cache_template_get_dishes])
+        elif repository == 'submenu':
+            cache_template = f'menu:{kwargs["menu_id"]}:submenu:{kwargs["submenu_id"]}'
+
+            caches_to_delete.extend(
+                [
+                    f'get_submenus:{kwargs["menu_id"]}',
+                    f'menu:{kwargs["menu_id"]}',
+                    f'get_dishes:{kwargs["menu_id"]}:{kwargs["submenu_id"]}',
+                    cache_template
+                ]
+            )
+
+            patterns.append(f'{cache_template}:*')
+        elif repository == 'dish':
+            caches_to_delete.extend(
+                [
+                    f'menu:{kwargs["menu_id"]}:submenu:{kwargs["submenu_id"]}:dish:{kwargs["dish_id"]}',
+                    f'menu:{kwargs["menu_id"]}',
+                    f'menu:{kwargs["menu_id"]}:submenu:{kwargs["submenu_id"]}',
+                    f'get_dishes:{kwargs["menu_id"]}:{kwargs["submenu_id"]}'
+                ]
+            )
+
+        caches_to_delete.append(cache_template)
+
         async with await self.get_redis() as redis:
-            await redis.flushdb(asynchronous=True)
+
+            if repository == 'dish':
+                return await redis.unlink(*caches_to_delete)
+
+            for pattern in patterns:
+                result = await redis.scan(match=pattern)
+                for key in result[1]:
+                    caches_to_delete.append(key.decode('utf-8'))
+
+            await redis.unlink(*caches_to_delete)

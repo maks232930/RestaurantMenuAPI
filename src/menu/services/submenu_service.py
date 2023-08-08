@@ -22,5 +22,5 @@ class SubmenuService:
             -> SubmenuModel | None:
         return await self.submenu_repository.update_submenu(menu_id, submenu_id, submenu_update)
 
-    async def delete_submenu(self, submenu_id: UUID) -> SubmenuModel | None:
-        return await self.submenu_repository.delete_submenu(submenu_id)
+    async def delete_submenu(self, submenu_id: UUID, menu_id: UUID) -> SubmenuModel | None:
+        return await self.submenu_repository.delete_submenu(submenu_id, menu_id)
