@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
+from src.menu.api.dependencies import get_cache_service
 from src.menu.models.dish_model import DishModel
 from src.menu.repositorys.dish_repository import DishRepository
 from src.menu.schemas.dish_schema import DishCreate, DishUpdate
+from src.menu.services.cache_service import CacheService
 from src.menu.services.dish_service import DishService
 
 router = APIRouter(
@@ -15,9 +17,11 @@ router = APIRouter(
 )
 
 
-async def get_dish_service(session: AsyncSession = Depends(get_async_session)) -> DishService:
-    menu_repository: DishRepository = DishRepository(session)
-    return DishService(menu_repository)
+async def get_dish_service(
+        session: AsyncSession = Depends(get_async_session),
+        cache_service: CacheService = Depends(get_cache_service)) -> DishService:
+    dish_repository: DishRepository = DishRepository(session)
+    return DishService(dish_repository, cache_service)
 
 
 @router.get('/menus/{menu_id}/submenus/{submenu_id}/dishes', response_model=list[DishModel])

@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
+from src.menu.api.dependencies import get_cache_service
 from src.menu.models.menu_model import MenuDetailModel, MenuModel
 from src.menu.repositorys.menu_repository import MenuRepository
 from src.menu.schemas.menu_schema import MenuCreate, MenuUpdate
+from src.menu.services.cache_service import CacheService
 from src.menu.services.menu_service import MenuService
 
 router = APIRouter(
@@ -15,9 +17,11 @@ router = APIRouter(
 )
 
 
-async def get_menu_service(session: AsyncSession = Depends(get_async_session)) -> MenuService:
+async def get_menu_service(
+        session: AsyncSession = Depends(get_async_session),
+        cache_service: CacheService = Depends(get_cache_service)) -> MenuService:
     menu_repository: MenuRepository = MenuRepository(session)
-    return MenuService(menu_repository)
+    return MenuService(menu_repository, cache_service)
 
 
 @router.get('/menus', response_model=list[MenuModel])

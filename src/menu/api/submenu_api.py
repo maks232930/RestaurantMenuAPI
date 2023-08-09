@@ -4,9 +4,11 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
+from src.menu.api.dependencies import get_cache_service
 from src.menu.models.submenu_model import SubmenuDetailModel, SubmenuModel
 from src.menu.repositorys.submenu_repository import SubmenuRepository
 from src.menu.schemas.submenu_schema import SubmenuCreate, SubmenuUpdate
+from src.menu.services.cache_service import CacheService
 from src.menu.services.submenu_service import SubmenuService
 
 router = APIRouter(
@@ -15,9 +17,12 @@ router = APIRouter(
 )
 
 
-async def get_submenu_service(session: AsyncSession = Depends(get_async_session)) -> SubmenuService:
+async def get_submenu_service(
+        session: AsyncSession = Depends(get_async_session),
+        cache_service: CacheService = Depends(get_cache_service)) -> SubmenuService:
+
     submenu_repository: SubmenuRepository = SubmenuRepository(session)
-    return SubmenuService(submenu_repository)
+    return SubmenuService(submenu_repository, cache_service)
 
 
 @router.get('/menus/{menu_id}/submenus', response_model=list[SubmenuModel])

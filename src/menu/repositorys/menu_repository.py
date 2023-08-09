@@ -17,11 +17,6 @@ class MenuRepository(BaseRepository):
         return result.scalars().first()
 
     async def get_menu_detail(self, menu_id: UUID) -> MenuDetailModel | None:
-        cache_key: str = f'menu:{menu_id}'
-        result: MenuDetailModel = await self.get_cache(cache_key)
-        if result:
-            return result
-
         subquery: Any = select(
             Dish.submenu_id,
             func.count(Dish.id).label('submenu_dish_count')
@@ -50,18 +45,12 @@ class MenuRepository(BaseRepository):
             dishes_count=int(menu.total_dish_count) if menu.total_dish_count is not None else 0
         )
 
-        await self.set_cache(cache_key=cache_key, result=menu_detail)
         return menu_detail
 
     async def get_menus(self) -> list[MenuModel]:
-        result: list[MenuModel] | Result = await self.get_cache('get_menus')
-        if result:
-            return result
-
         query: Select = select(Menu)
         result = await self.session.execute(query)
         result_all: list[MenuModel] = result.scalars().all()
-        await self.set_cache(cache_key='get_menus', result=result_all)
         return result_all
 
     async def create_menu(self, menu_create: MenuCreate) -> MenuModel:
@@ -70,21 +59,12 @@ class MenuRepository(BaseRepository):
         await self.session.commit()
         await self.session.refresh(db_menu)
 
-        await self.delete_cache(['get_menus'])
-
         return db_menu
 
     async def update_menu(self, menu_id: UUID, menu_update: MenuUpdate) -> MenuModel | None:
         query: Update = update(Menu).where(Menu.id == menu_id).values(**menu_update.model_dump())
         await self.session.execute(query)
         await self.session.commit()
-
-        await self.delete_cache(
-            [
-                'get_menus',
-                f'menu:{menu_id}'
-            ]
-        )
 
         return await self.get_menu_by_id(menu_id)
 
@@ -97,7 +77,5 @@ class MenuRepository(BaseRepository):
         query: Delete = delete(Menu).where(Menu.id == menu_id)
         await self.session.execute(query)
         await self.session.commit()
-
-        await self.delete_related_cache(repository='menu', menu_id=menu_id)
 
         return db_menu
