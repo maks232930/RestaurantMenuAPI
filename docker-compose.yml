@@ -12,6 +12,8 @@ services:
     depends_on:
       - redis
       - db
+      - rabbitmq
+      - celery_worker
 
   db:
     image: postgres:15.1-alpine
@@ -19,9 +21,25 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     env_file:
       - ./.env_db
+    ports:
+      - "5555:5432"
 
   redis:
     image: redis:7-alpine
+
+  rabbitmq:
+    image: rabbitmq:3.12-alpine
+
+  celery_worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.celery
+    command: celery -A src.menu.worker.celery_app worker --loglevel=info
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+      - redis
 
 
 volumes:

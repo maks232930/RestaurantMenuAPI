@@ -1,6 +1,8 @@
 from typing import Any
 from uuid import UUID
 
+from fastapi import BackgroundTasks
+
 from src.menu.models.submenu_model import SubmenuDetailModel, SubmenuModel
 from src.menu.repositorys.submenu_repository import SubmenuRepository
 from src.menu.schemas.submenu_schema import SubmenuCreate, SubmenuUpdate
@@ -33,27 +35,27 @@ class SubmenuService:
         await self.cache_service.set_cache(cache_key=cache_key, result=result)
         return result
 
-    async def create_submenu(self, menu_id: UUID, submenu_create: SubmenuCreate) -> SubmenuModel | None:
-        await self.cache_service.delete_cache(
-            [
-                f'menu:{menu_id}',
-                f'get_submenus:{menu_id}'
-            ]
-        )
+    async def create_submenu(self, menu_id: UUID, submenu_create: SubmenuCreate,
+                             background_tasks: BackgroundTasks) -> SubmenuModel | None:
+        background_tasks.add_task(self.cache_service.delete_cache, [
+            f'menu:{menu_id}',
+            f'get_submenus:{menu_id}'
+        ])
 
         return await self.submenu_repository.create_submenu(menu_id, submenu_create)
 
-    async def update_submenu(self, menu_id: UUID, submenu_id: UUID, submenu_update: SubmenuUpdate) \
-            -> SubmenuModel | None:
-        await self.cache_service.delete_cache(
-            [
-                f'get_submenus:{menu_id}',
-                f'menu:{menu_id}:submenu:{submenu_id}'
-            ]
-        )
+    async def update_submenu(self, menu_id: UUID, submenu_id: UUID, submenu_update: SubmenuUpdate,
+                             background_tasks: BackgroundTasks) -> SubmenuModel | None:
+        background_tasks.add_task(self.cache_service.delete_cache, [
+            f'get_submenus:{menu_id}',
+            f'menu:{menu_id}:submenu:{submenu_id}'
+        ])
 
         return await self.submenu_repository.update_submenu(menu_id, submenu_id, submenu_update)
 
-    async def delete_submenu(self, submenu_id: UUID, menu_id: UUID) -> SubmenuModel | None:
-        await self.cache_service.delete_related_cache(repository='submenu', menu_id=menu_id, submenu_id=submenu_id)
+    async def delete_submenu(self, submenu_id: UUID, menu_id: UUID,
+                             background_tasks: BackgroundTasks) -> SubmenuModel | None:
+        background_tasks.add_task(self.cache_service.delete_related_cache, repository='submenu', menu_id=menu_id,
+                                  submenu_id=submenu_id)
+
         return await self.submenu_repository.delete_submenu(submenu_id)

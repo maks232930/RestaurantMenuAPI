@@ -1,6 +1,6 @@
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.database import get_async_session
@@ -20,7 +20,6 @@ router = APIRouter(
 async def get_submenu_service(
         session: AsyncSession = Depends(get_async_session),
         cache_service: CacheService = Depends(get_cache_service)) -> SubmenuService:
-
     submenu_repository: SubmenuRepository = SubmenuRepository(session)
     return SubmenuService(submenu_repository, cache_service)
 
@@ -43,16 +42,18 @@ async def get_submenu(menu_id: UUID, submenu_id: UUID,
 
 
 @router.post('/menus/{menu_id}/submenus', response_model=SubmenuModel, status_code=201)
-async def create_submenu(menu_id: UUID, submenu_create: SubmenuCreate,
+async def create_submenu(menu_id: UUID, submenu_create: SubmenuCreate, background_tasks: BackgroundTasks,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu: SubmenuModel | None = await submenu_service.create_submenu(menu_id, submenu_create)
+    db_submenu: SubmenuModel | None = await submenu_service.create_submenu(menu_id, submenu_create, background_tasks)
     return db_submenu
 
 
 @router.patch('/menus/{menu_id}/submenus/{submenu_id}', response_model=SubmenuModel)
 async def update_submenu(menu_id: UUID, submenu_id: UUID, submenu_update: SubmenuUpdate,
+                         background_tasks: BackgroundTasks,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu: SubmenuModel | None = await submenu_service.update_submenu(menu_id, submenu_id, submenu_update)
+    db_submenu: SubmenuModel | None = await submenu_service.update_submenu(menu_id, submenu_id, submenu_update,
+                                                                           background_tasks)
 
     if not db_submenu:
         raise HTTPException(status_code=404, detail='submenu not found')
@@ -61,9 +62,9 @@ async def update_submenu(menu_id: UUID, submenu_id: UUID, submenu_update: Submen
 
 
 @router.delete('/menus/{menu_id}/submenus/{submenu_id}', response_model=SubmenuModel)
-async def delete_submenu(submenu_id: UUID, menu_id: UUID,
+async def delete_submenu(submenu_id: UUID, menu_id: UUID, background_tasks: BackgroundTasks,
                          submenu_service: SubmenuService = Depends(get_submenu_service)) -> SubmenuModel | None:
-    db_submenu: SubmenuModel | None = await submenu_service.delete_submenu(submenu_id, menu_id)
+    db_submenu: SubmenuModel | None = await submenu_service.delete_submenu(submenu_id, menu_id, background_tasks)
 
     if not db_submenu:
         raise HTTPException(status_code=404, detail='submenu not found')

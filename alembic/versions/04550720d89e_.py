@@ -22,7 +22,8 @@ def upgrade() -> None:
                     sa.Column('id', sa.UUID(), nullable=False),
                     sa.Column('title', sa.String(), nullable=False),
                     sa.Column('description', sa.String(), nullable=False),
-                    sa.PrimaryKeyConstraint('id')
+                    sa.PrimaryKeyConstraint('id'),
+                    sa.UniqueConstraint('title')
                     )
     op.create_table('submenu',
                     sa.Column('id', sa.UUID(), nullable=False),
@@ -31,7 +32,7 @@ def upgrade() -> None:
                     sa.Column('menu_id', sa.UUID(), nullable=False),
                     sa.ForeignKeyConstraint(['menu_id'], ['menu.id'], ondelete='CASCADE'),
                     sa.PrimaryKeyConstraint('id'),
-                    sa.UniqueConstraint('menu_id')
+                    sa.UniqueConstraint('title')
                     )
     op.create_table('dish',
                     sa.Column('id', sa.UUID(), nullable=False),

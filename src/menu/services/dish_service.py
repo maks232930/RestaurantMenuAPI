@@ -1,5 +1,6 @@
 from uuid import UUID
 
+from fastapi import BackgroundTasks
 from sqlalchemy import Result
 
 from src.menu.models.dish_model import DishModel
@@ -34,30 +35,28 @@ class DishService:
         await self.cache_service.set_cache(cache_key=cache_key, result=result)
         return result
 
-    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate, menu_id: UUID) -> DishModel | None:
-        await self.cache_service.delete_cache(
-            [
-                f'menu:{menu_id}',
-                f'menu:{menu_id}:submenu:{submenu_id}',
-                f'get_dishes:{menu_id}:{submenu_id}'
-            ]
-        )
+    async def create_dish(self, submenu_id: UUID, dish_create: DishCreate, menu_id: UUID,
+                          background_tasks: BackgroundTasks) -> DishModel | None:
+        background_tasks.add_task(self.cache_service.delete_cache, [
+            f'menu:{menu_id}',
+            f'menu:{menu_id}:submenu:{submenu_id}',
+            f'get_dishes:{menu_id}:{submenu_id}'
+        ])
+
         return await self.dish_repository.create_dish(submenu_id, dish_create)
 
-    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate, menu_id: UUID, submenu_id: UUID) \
-            -> DishModel | None:
+    async def update_dish(self, dish_id: UUID, dish_update: DishUpdate, menu_id: UUID, submenu_id: UUID,
+                          background_tasks: BackgroundTasks) -> DishModel | None:
+        background_tasks.add_task(self.cache_service.delete_cache, [
+            f'get_dishes:{menu_id}:{submenu_id}',
+            f'menu:{menu_id}:submenu:{submenu_id}:dish:{dish_id}'
+        ])
 
-        await self.cache_service.delete_cache(
-            [
-                f'get_dishes:{menu_id}:{submenu_id}',
-                f'menu:{menu_id}:submenu:{submenu_id}:dish:{dish_id}'
-            ]
-        )
         return await self.dish_repository.update_dish(dish_id, dish_update)
 
-    async def delete_menu(self, menu_id: UUID, submenu_id: UUID, dish_id: UUID) -> DishModel | None:
-        result = await self.dish_repository.delete_dish(dish_id)
-        await self.cache_service.delete_related_cache(repository='dish', menu_id=menu_id, submenu_id=submenu_id,
-                                                      dish_id=dish_id)
+    async def delete_menu(self, menu_id: UUID, submenu_id: UUID, dish_id: UUID,
+                          background_tasks: BackgroundTasks) -> DishModel | None:
+        background_tasks.add_task(self.cache_service.delete_related_cache, repository='dish', menu_id=menu_id,
+                                  submenu_id=submenu_id, dish_id=dish_id)
 
-        return result
+        return await self.dish_repository.delete_dish(dish_id)

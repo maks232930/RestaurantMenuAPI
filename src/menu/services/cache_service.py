@@ -36,7 +36,7 @@ class CacheService:
 
     async def delete_cache(self, cache_keys: list[str]) -> None:
         async with await self.get_redis() as redis:
-            await redis.unlink(*cache_keys)
+            await redis.unlink(*cache_keys, 'get_full_menu')
 
     async def delete_related_cache(self, repository: str, **kwargs) -> None:
         caches_to_delete: list = []
@@ -79,7 +79,7 @@ class CacheService:
                 ]
             )
 
-        caches_to_delete.append(cache_template)
+        caches_to_delete.extend([cache_template, 'get_full_menu'])
 
         async with await self.get_redis() as redis:
 
