@@ -26,3 +26,7 @@ class DishModel(BaseModel):
     description: str
     price: Decimal
     submenu_id: UUID4
+
+
+class CustomDishModel(DishModel):
+    menu_id: UUID4

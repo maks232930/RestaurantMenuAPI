@@ -11,4 +11,6 @@ RUN pip install -r requirements.txt
 
 COPY . .
 
-CMD celery -A src.menu.worker.celery_app worker --loglevel=info
+RUN chmod +x start_celery.sh
+
+CMD ["sh", "start_celery.sh"]

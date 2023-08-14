@@ -34,13 +34,14 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.celery
-    command: celery -A src.menu.worker.celery_app worker --loglevel=info
+    restart: always
+    volumes:
+      - ./src/menu/admin:/app/src/menu/admin
     env_file:
       - .env
     depends_on:
       - rabbitmq
       - redis
-
 
 volumes:
   postgres_data:

@@ -11,7 +11,6 @@ celery_app = Celery('RestaurantMenuApi',
                     broker=f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}',
                     include=['src.menu.worker.tasks.excel_sync_task'])
 
-# Настройки Celery
 celery_app.conf.update(
     task_serializer='json',
     accept_content=['json'],
@@ -19,3 +18,10 @@ celery_app.conf.update(
     timezone='Europe/Minsk',
     enable_utc=True,
 )
+
+celery_app.conf.beat_schedule = {
+    'sync_excel_to_db': {
+        'task': 'src.menu.worker.tasks.excel_sync_task.sync_excel_to_db',
+        'schedule': 15.0,
+    },
+}
