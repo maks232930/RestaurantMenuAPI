@@ -1,7 +1,8 @@
 from typing import Any, AsyncGenerator
 
+from sqlalchemy import Engine, create_engine
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, create_async_engine
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import Session, declarative_base, scoped_session, sessionmaker
 
 from src.config import (
     DB_HOST,
@@ -20,6 +21,10 @@ Base: Any = declarative_base()
 
 engine: AsyncEngine = create_async_engine(DATABASE_URL)
 async_session_maker: sessionmaker = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
+
+DATABASE_URL_SYNC = f'postgresql://{DB_USER}:{DB_PASS}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+engine_sync: Engine = create_engine(DATABASE_URL_SYNC, echo=True)
+SessionSync: scoped_session[Session] = scoped_session(sessionmaker(bind=engine_sync))
 
 
 async def get_async_session() -> AsyncGenerator[AsyncSession, None]:

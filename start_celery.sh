@@ -1,9 +1,11 @@
 #!/bin/bash
 
-sleep 20
+./wait-for-it.sh rabbitmq:5672 --timeout=100
 
-celery -A src.menu.worker.celery_app worker --loglevel=info &
+sleep 5
+
+celery -A src.menu.worker.celery_app worker &
 
 sleep 15
 
-celery -A src.menu.worker.celery_app beat --loglevel=info
+celery -A src.menu.worker.celery_app beat
