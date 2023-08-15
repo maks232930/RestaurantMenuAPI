@@ -1,11 +1,16 @@
 from celery import Celery
+from redis import StrictRedis
 
 from src.config import (
     RABBITMQ_HOST,
     RABBITMQ_PASSWORD,
     RABBITMQ_PORT,
     RABBITMQ_USERNAME,
+    REDIS_HOST,
+    REDIS_PORT,
 )
+
+redis_connection = StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
 celery_app = Celery('RestaurantMenuApi',
                     broker=f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}',

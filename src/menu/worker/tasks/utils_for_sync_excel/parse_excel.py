@@ -39,10 +39,10 @@ def is_valid_uuid(uuid_str):
         return False
 
 
-def parse_workbook(sheet) -> tuple[list[MenuModel], list[SubmenuModel], list[DishModel]]:
+def parse_workbook(sheet) -> tuple[list[MenuModel], list[SubmenuModel], list[Any]]:
     menu_data: list[MenuModel] = []
     submenu_data: list[SubmenuModel] = []
-    dish_data: list[DishModel] = []
+    dish_data: Any = []
     menu_id = None
     submenu_id = None
 
@@ -72,6 +72,8 @@ def parse_workbook(sheet) -> tuple[list[MenuModel], list[SubmenuModel], list[Dis
                     check_data = is_valid_data('dish', [row[2], row[3], row[4], row[5], submenu_id])
                     if check_data:
                         dish_data.append(
-                            DishModel(id=UUID(row[2]), title=row[3], description=row[4], price=row[5],
-                                      submenu_id=submenu_id))
+                            [DishModel(id=UUID(row[2]), title=row[3], description=row[4], price=row[5],
+                                       submenu_id=submenu_id),
+                             menu_id
+                             ])
     return menu_data, submenu_data, dish_data

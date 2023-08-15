@@ -13,8 +13,8 @@ def create_menu(session, offline_menu):
     session.refresh(db_menu)
 
 
-def update_menu(session, menu, offline_menu):
-    query = update(Menu).where(Menu.id == menu.id).values(**offline_menu.model_dump())
+def update_menu(session, offline_menu):
+    query = update(Menu).where(Menu.id == offline_menu.id).values(**offline_menu.model_dump())
     session.execute(query)
     session.commit()
 

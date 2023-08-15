@@ -10,7 +10,7 @@ DB_NAME: str | None = os.environ.get('DB_NAME')
 DB_USER: str | None = os.environ.get('DB_USER')
 DB_PASS: str | None = os.environ.get('DB_PASS')
 
-REDIS_PORT: str | None = os.environ.get('REDIS_PORT')
+REDIS_PORT: str | int | None = os.environ.get('REDIS_PORT')
 REDIS_HOST: str | None = os.environ.get('REDIS_HOST')
 
 RABBITMQ_HOST: str | None = os.environ.get('RABBITMQ_HOST')
