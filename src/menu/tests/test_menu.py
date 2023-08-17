@@ -1,12 +1,13 @@
 import pytest
+from httpx import Response
 
 from src.menu.tests.conftest import DATA_DISH, DATA_MENU, DATA_MENU_UPDATE, DATA_SUBMENU
 
 
 @pytest.mark.asyncio
 async def test_create_menu(test_client):
-    response = await test_client.post('/menus', json=DATA_MENU)
-    response_json = response.json()
+    response: Response = await test_client.post('/menus', json=DATA_MENU)
+    response_json: dict = response.json()
 
     assert response.status_code == 201
     assert response_json['id'] == DATA_MENU['id']
@@ -16,8 +17,8 @@ async def test_create_menu(test_client):
 
 @pytest.mark.asyncio
 async def test_get_menus(test_client):
-    response = await test_client.get('/menus')
-    response_json = response.json()
+    response: Response = await test_client.get('/menus')
+    response_json: dict = response.json()
 
     assert len(response_json) == 1
     assert response_json[0]['id'] == DATA_MENU['id']
@@ -27,8 +28,8 @@ async def test_get_menus(test_client):
 
 @pytest.mark.asyncio
 async def test_get_menu_detail(test_client):
-    response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
-    response_json = response.json()
+    response: Response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
+    response_json: dict = response.json()
 
     assert response_json['id'] == DATA_MENU['id']
     assert response_json['title'] == DATA_MENU['title']
@@ -42,8 +43,8 @@ async def test_get_full_menu(test_client):
     await test_client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
     await test_client.post(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes',
                            json=DATA_DISH)
-    response = await test_client.get('/menus/full')
-    response_json = response.json()
+    response: Response = await test_client.get('/menus/full')
+    response_json: dict = response.json()
 
     assert response_json[0]['menu']['id'] == DATA_MENU['id']
     assert response_json[0]['menu']['title'] == DATA_MENU['title']
@@ -61,8 +62,8 @@ async def test_get_full_menu(test_client):
 
 @pytest.mark.asyncio
 async def test_patch_menu(test_client):
-    response = await test_client.patch(f'/menus/{DATA_MENU["id"]}', json=DATA_MENU_UPDATE)
-    response_json = response.json()
+    response: Response = await test_client.patch(f'/menus/{DATA_MENU["id"]}', json=DATA_MENU_UPDATE)
+    response_json: dict = response.json()
 
     assert response_json['title'] == DATA_MENU_UPDATE['title']
     assert response_json['description'] == DATA_MENU_UPDATE['description']
@@ -71,6 +72,6 @@ async def test_patch_menu(test_client):
 @pytest.mark.asyncio
 async def test_delete_menu(test_client):
     await test_client.delete(f'/menus/{DATA_MENU["id"]}')
-    response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
+    response: Response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
 
     assert response.status_code == 404

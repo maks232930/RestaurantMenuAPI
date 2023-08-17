@@ -1,8 +1,6 @@
 <h1>Restaurant Menu API</h1>
 <b>Этот проект реализует REST API на базе FastAPI для управления меню ресторана с операциями CRUD. В качестве базы данных используется PostgreSQL. В проекте предоставлена коллекция Postman с тестами для проверки. Задача считается выполненной, если все тесты успешно проходят.</b>
 
-<h1>Комментарий не актуален! Все работает!</h1>
-
 <h2>Реализованы все основные задачи, и одна дополнительная(Реализовать вывод количества подменю и блюд для Меню через один (сложный) ORM запрос.)</h2>
 <b>RestaurantMenuAPI/src/menu/repositorys /menu_repository.py def get_menu_detail</b>
 
@@ -21,6 +19,7 @@ Docker (для контейниризации)<br>
 <ul>
 <li><b>Клонируйте репозиторий</b>: git clone <a>https://github.com/yourusehttps://github.com/maks232930/RestaurantMenuAPI</a></li>
 <li><b>Перейдите в директорию проекта</b>: cd RestaurantMenuAPI</li>
+<li>Для прохождения тестов через Postman, очистите ексель</li>
 <li><b>Соберите и запустите контейнеры</b>: sudo docker-compose up --build -d</li>
 </ul>
 

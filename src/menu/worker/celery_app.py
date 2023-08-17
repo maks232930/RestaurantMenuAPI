@@ -12,9 +12,9 @@ from src.config import (
 
 redis_connection = StrictRedis(host=REDIS_HOST, port=REDIS_PORT, db=0)
 
-celery_app = Celery('RestaurantMenuApi',
-                    broker=f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}',
-                    include=['src.menu.worker.tasks.excel_sync_task'])
+celery_app: Celery = Celery('RestaurantMenuApi',
+                            broker=f'amqp://{RABBITMQ_USERNAME}:{RABBITMQ_PASSWORD}@{RABBITMQ_HOST}:{RABBITMQ_PORT}',
+                            include=['src.menu.worker.tasks.excel_sync_task'])
 
 celery_app.conf.update(
     task_serializer='json',

@@ -1,4 +1,5 @@
 import os
+from typing import Any
 
 import openpyxl
 
@@ -19,8 +20,8 @@ from src.menu.worker.tasks.utils_for_sync_excel.utils import ensure_directory_ex
 @celery_app.task
 def sync_excel_to_db():
     try:
-        wb = openpyxl.load_workbook('src/menu/admin/Menu.xlsx')
-        sheet = wb.active
+        wb: Any = openpyxl.load_workbook('src/menu/admin/Menu.xlsx')
+        sheet: Any = wb.active
         menu_data_offline, submenu_data_offline, dish_data_offline = parse_workbook(sheet)
 
         if len(menu_data_offline) + len(submenu_data_offline) + len(dish_data_offline) == 0:
@@ -35,6 +36,6 @@ def sync_excel_to_db():
 
     except FileNotFoundError:
         repr('Файл не найден!')
-        directory_path = 'src/menu/admin'
+        directory_path: str = 'src/menu/admin'
         ensure_directory_exists(directory_path)
         open(os.path.join(directory_path, 'Menu.xlsx'), 'w')

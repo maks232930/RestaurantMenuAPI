@@ -29,9 +29,9 @@ def is_valid_data(model: str, data: list) -> bool:
     return False
 
 
-def is_valid_uuid(uuid_str):
+def is_valid_uuid(uuid_str: str) -> bool:
     try:
-        uuid_obj = UUID(uuid_str)
+        uuid_obj: UUID = UUID(uuid_str)
         return str(uuid_obj) == uuid_str
     except ValueError:
         return False
@@ -39,7 +39,7 @@ def is_valid_uuid(uuid_str):
         return False
 
 
-def parse_workbook(sheet) -> tuple[list[MenuModel], list[SubmenuModel], list[Any]]:
+def parse_workbook(sheet: Any) -> tuple[list[MenuModel], list[SubmenuModel], list[Any]]:
     menu_data: list[MenuModel] = []
     submenu_data: list[SubmenuModel] = []
     dish_data: Any = []
