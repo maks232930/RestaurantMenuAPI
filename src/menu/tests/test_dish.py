@@ -5,7 +5,7 @@ from src.menu.tests.conftest import DATA_DISH, DATA_DISH_UPDATE, DATA_MENU, DATA
 
 
 @pytest.mark.asyncio
-async def test_create_dish(test_client: AsyncClient):
+async def test_create_dish(test_client: AsyncClient) -> None:
     await test_client.post('/menus', json=DATA_MENU)
     await test_client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
     response: Response = await test_client.post(
@@ -22,7 +22,7 @@ async def test_create_dish(test_client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_get_dishes(test_client: AsyncClient):
+async def test_get_dishes(test_client: AsyncClient) -> None:
     response: Response = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes')
     response_json: dict = response.json()
 
@@ -34,7 +34,7 @@ async def test_get_dishes(test_client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_get_dish(test_client: AsyncClient):
+async def test_get_dish(test_client: AsyncClient) -> None:
     response: Response = await test_client.get(
         f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}')
     response_json: dict = response.json()
@@ -47,7 +47,7 @@ async def test_get_dish(test_client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_patch_dish(test_client: AsyncClient):
+async def test_patch_dish(test_client: AsyncClient) -> None:
     response: Response = await test_client.patch(
         f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}',
         json=DATA_DISH_UPDATE)
@@ -60,7 +60,7 @@ async def test_patch_dish(test_client: AsyncClient):
 
 
 @pytest.mark.asyncio
-async def test_delete_dish(test_client: AsyncClient):
+async def test_delete_dish(test_client: AsyncClient) -> None:
     await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes/{DATA_DISH["id"]}')
     await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
     await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}')
