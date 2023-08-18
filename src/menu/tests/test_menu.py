@@ -1,11 +1,11 @@
 import pytest
-from httpx import Response
+from httpx import AsyncClient, Response
 
 from src.menu.tests.conftest import DATA_DISH, DATA_MENU, DATA_MENU_UPDATE, DATA_SUBMENU
 
 
 @pytest.mark.asyncio
-async def test_create_menu(test_client):
+async def test_create_menu(test_client: AsyncClient):
     response: Response = await test_client.post('/menus', json=DATA_MENU)
     response_json: dict = response.json()
 
@@ -16,7 +16,7 @@ async def test_create_menu(test_client):
 
 
 @pytest.mark.asyncio
-async def test_get_menus(test_client):
+async def test_get_menus(test_client: AsyncClient):
     response: Response = await test_client.get('/menus')
     response_json: dict = response.json()
 
@@ -27,7 +27,7 @@ async def test_get_menus(test_client):
 
 
 @pytest.mark.asyncio
-async def test_get_menu_detail(test_client):
+async def test_get_menu_detail(test_client: AsyncClient):
     response: Response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
     response_json: dict = response.json()
 
@@ -39,7 +39,7 @@ async def test_get_menu_detail(test_client):
 
 
 @pytest.mark.asyncio
-async def test_get_full_menu(test_client):
+async def test_get_full_menu(test_client: AsyncClient):
     await test_client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
     await test_client.post(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}/dishes',
                            json=DATA_DISH)
@@ -61,7 +61,7 @@ async def test_get_full_menu(test_client):
 
 
 @pytest.mark.asyncio
-async def test_patch_menu(test_client):
+async def test_patch_menu(test_client: AsyncClient):
     response: Response = await test_client.patch(f'/menus/{DATA_MENU["id"]}', json=DATA_MENU_UPDATE)
     response_json: dict = response.json()
 
@@ -70,7 +70,7 @@ async def test_patch_menu(test_client):
 
 
 @pytest.mark.asyncio
-async def test_delete_menu(test_client):
+async def test_delete_menu(test_client: AsyncClient):
     await test_client.delete(f'/menus/{DATA_MENU["id"]}')
     response: Response = await test_client.get(f'/menus/{DATA_MENU["id"]}')
 

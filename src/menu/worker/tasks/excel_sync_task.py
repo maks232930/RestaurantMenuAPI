@@ -1,7 +1,8 @@
 import os
-from typing import Any
 
 import openpyxl
+from openpyxl.workbook import Workbook
+from openpyxl.worksheet.worksheet import Worksheet
 
 from src.database import SessionSync
 from src.menu.worker.celery_app import celery_app
@@ -18,10 +19,10 @@ from src.menu.worker.tasks.utils_for_sync_excel.utils import ensure_directory_ex
 
 
 @celery_app.task
-def sync_excel_to_db():
+def sync_excel_to_db() -> str:
     try:
-        wb: Any = openpyxl.load_workbook('src/menu/admin/Menu.xlsx')
-        sheet: Any = wb.active
+        wb: Workbook = openpyxl.load_workbook('src/menu/admin/Menu.xlsx')
+        sheet: Worksheet = wb.active
         menu_data_offline, submenu_data_offline, dish_data_offline = parse_workbook(sheet)
 
         if len(menu_data_offline) + len(submenu_data_offline) + len(dish_data_offline) == 0:

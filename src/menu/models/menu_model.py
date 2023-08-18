@@ -2,7 +2,7 @@ import uuid
 
 from pydantic import UUID4, BaseModel
 from sqlalchemy import UUID, Column, String
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, relationship
 
 from src.database import Base
 
@@ -14,7 +14,7 @@ class Menu(Base):
     title: str = Column(String, nullable=False, unique=True)
     description: str = Column(String, nullable=False)
 
-    submenus = relationship('Submenu', back_populates='menu')
+    submenus: Mapped[list['Submenu']] = relationship('Submenu', back_populates='menu')
 
 
 class MenuModel(BaseModel):

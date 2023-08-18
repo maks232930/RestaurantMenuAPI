@@ -1,6 +1,6 @@
-from typing import Any
+from typing import Sequence
 
-from sqlalchemy import Select, Update, select, update
+from sqlalchemy import Result, Select, Update, select, update
 from sqlalchemy.orm import Session, selectinload
 
 from src.menu.models.dish_model import Dish, DishModel
@@ -66,8 +66,8 @@ def get_custom_full_menu(session: Session) -> tuple[list[MenuModel], list[Submen
             .selectinload(Submenu.dishes)
         )
     )
-    result: Any = session.execute(menu_query)
-    menus: Any = result.scalars().all()
+    result: Result = session.execute(menu_query)
+    menus: Sequence = result.scalars().all()
 
     menu_data: list[MenuModel] = []
     submenu_data: list[SubmenuModel] = []

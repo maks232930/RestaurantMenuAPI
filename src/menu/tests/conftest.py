@@ -35,7 +35,7 @@ DATA_DISH_UPDATE: dict = {'title': 'Title update',
 
 
 @pytest.fixture(scope='session')
-def event_loop(request) -> Generator[AbstractEventLoop, Any, None]:
+def event_loop(request: Any) -> Generator[AbstractEventLoop, Any, None]:
     """Create an instance of the default event loop for each test case."""
     loop: AbstractEventLoop = asyncio.get_event_loop_policy().new_event_loop()
     yield loop

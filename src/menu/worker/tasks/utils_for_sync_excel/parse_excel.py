@@ -2,6 +2,8 @@ from decimal import Decimal
 from typing import Any, Union
 from uuid import UUID
 
+from openpyxl.worksheet.worksheet import Worksheet
+
 from src.menu.models.dish_model import DishModel
 from src.menu.models.menu_model import MenuModel
 from src.menu.models.submenu_model import SubmenuModel
@@ -39,18 +41,18 @@ def is_valid_uuid(uuid_str: str) -> bool:
         return False
 
 
-def parse_workbook(sheet: Any) -> tuple[list[MenuModel], list[SubmenuModel], list[Any]]:
+def parse_workbook(sheet: Worksheet) -> tuple[list[MenuModel], list[SubmenuModel], list[Any]]:
     menu_data: list[MenuModel] = []
     submenu_data: list[SubmenuModel] = []
-    dish_data: Any = []
-    menu_id = None
-    submenu_id = None
+    dish_data: list[Any] = []
+    menu_id: UUID | None = None
+    submenu_id: UUID | None = None
 
     for row in sheet.iter_rows(min_row=1, values_only=True):
         if row[0] is not None:
             menu_id, submenu_id = None, None
             if is_valid_uuid(row[0]):
-                check_data = is_valid_data('menu', [UUID(row[0]), row[1], row[2]])
+                check_data: bool = is_valid_data('menu', [UUID(row[0]), row[1], row[2]])
                 if check_data:
                     menu_id = UUID(row[0])
                     menu_data.append(MenuModel(id=menu_id, title=row[1], description=row[2]))
@@ -61,7 +63,7 @@ def parse_workbook(sheet: Any) -> tuple[list[MenuModel], list[SubmenuModel], lis
             submenu_id = None
             if is_valid_uuid(row[1]):
                 if menu_id is not None:
-                    check_data = is_valid_data('submenu', [UUID(row[1]), row[2], row[3], menu_id])
+                    check_data: bool = is_valid_data('submenu', [UUID(row[1]), row[2], row[3], menu_id])
                     if check_data:
                         submenu_id = UUID(row[1])
                         submenu_data.append(
@@ -71,7 +73,7 @@ def parse_workbook(sheet: Any) -> tuple[list[MenuModel], list[SubmenuModel], lis
         if row[2] is not None:
             if is_valid_uuid(row[2]):
                 if submenu_id is not None:
-                    check_data = is_valid_data('dish', [UUID(row[2]), row[3], row[4], row[5], submenu_id])
+                    check_data: bool = is_valid_data('dish', [UUID(row[2]), row[3], row[4], row[5], submenu_id])
                     if check_data:
                         dish_data.append(
                             [DishModel(id=UUID(row[2]), title=row[3], description=row[4], price=row[5],

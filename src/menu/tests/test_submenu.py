@@ -1,11 +1,11 @@
 import pytest
-from httpx import Response
+from httpx import AsyncClient, Response
 
 from src.menu.tests.conftest import DATA_MENU, DATA_SUBMENU, DATA_SUBMENU_UPDATE
 
 
 @pytest.mark.asyncio
-async def test_create_submenu(test_client):
+async def test_create_submenu(test_client: AsyncClient):
     await test_client.post('/menus', json=DATA_MENU)
     response: Response = await test_client.post(f'/menus/{DATA_MENU["id"]}/submenus', json=DATA_SUBMENU)
     response_json: dict = response.json()
@@ -18,7 +18,7 @@ async def test_create_submenu(test_client):
 
 
 @pytest.mark.asyncio
-async def test_get_submenus(test_client):
+async def test_get_submenus(test_client: AsyncClient):
     response: Response = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus')
     response_json: dict = response.json()
 
@@ -31,7 +31,7 @@ async def test_get_submenus(test_client):
 
 
 @pytest.mark.asyncio
-async def test_get_submenu_detail(test_client):
+async def test_get_submenu_detail(test_client: AsyncClient):
     response: Response = await test_client.get(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
     response_json: dict = response.json()
 
@@ -43,7 +43,7 @@ async def test_get_submenu_detail(test_client):
 
 
 @pytest.mark.asyncio
-async def test_patch_submenu(test_client):
+async def test_patch_submenu(test_client: AsyncClient):
     response: Response = await test_client.patch(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}',
                                                  json=DATA_SUBMENU_UPDATE)
     response_json: dict = response.json()
@@ -54,7 +54,7 @@ async def test_patch_submenu(test_client):
 
 
 @pytest.mark.asyncio
-async def test_delete_submenu(test_client):
+async def test_delete_submenu(test_client: AsyncClient):
     await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}/submenus/{DATA_SUBMENU["id"]}')
     await test_client.delete(f'/menus/{DATA_SUBMENU["menu_id"]}')
 

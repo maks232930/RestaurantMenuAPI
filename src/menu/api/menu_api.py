@@ -31,7 +31,7 @@ async def get_menus(menu_service: MenuService = Depends(get_menu_service)) -> li
 
 
 @router.get('/menus/full', response_model=list[AllMenuModel])
-async def get_full_menu(menu_service: MenuService = Depends(get_menu_service)):
+async def get_full_menu(menu_service: MenuService = Depends(get_menu_service)) -> list[AllMenuModel] | None:
     return await menu_service.get_full_menu()
 
 
